@@ -12,7 +12,8 @@ import {
   SUFIJO_DOLAR_MEP,
 } from "./config";
 import { getRevalidateSeconds, isMercadoAbierto } from "./market-hours";
-import type { CotizacionesPanelResponse, CotizacionPanelItem, FilaCotizacion } from "./types";
+import type { CotizacionesPanelResponse, CotizacionPanelItem } from "./types";
+import type { FilaCotizacion } from "@/lib/types";
 
 /**
  * Mientras el mercado está operando, "Último" muestra el precio recién

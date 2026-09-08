@@ -1,4 +1,5 @@
-import type { FilaCotizacion } from "@/lib/iol/types";
+import type { FilaCotizacion } from "@/lib/types";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { CotizacionesTable } from "./CotizacionesTable";
 
 interface PanelSectionProps {
@@ -19,16 +20,14 @@ export function PanelSection({
   columnaPrecio,
 }: PanelSectionProps) {
   return (
-    <section className="flex flex-col gap-4">
+    <section className="flex flex-col gap-3">
       <header>
-        <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
-        <p className="text-sm text-gray-500">{description}</p>
+        <h2 className="text-base font-semibold text-foreground">{title}</h2>
+        <p className="text-xs text-muted-foreground">{description}</p>
       </header>
 
       {error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
+        <ErrorMessage>{error}</ErrorMessage>
       ) : (
         <CotizacionesTable
           items={items ?? []}

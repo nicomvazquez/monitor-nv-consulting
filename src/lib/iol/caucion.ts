@@ -6,7 +6,8 @@ import {
   CAUCION_UMBRAL_TASA_PESOS,
 } from "./config";
 import { getRevalidateSeconds } from "./market-hours";
-import type { CaucionesResponse, CaucionTitulo, FilaCotizacion } from "./types";
+import type { CaucionesResponse, CaucionTitulo } from "./types";
+import type { FilaCotizacion } from "@/lib/types";
 
 export interface TasaCaucionMoneda {
   /** Plazo del que realmente vino la tasa: null si no hubo ninguno dentro del radio de tolerancia. */

@@ -1,26 +1,98 @@
 @import "tailwindcss";
 
+/*
+ * Paleta marrones + negro puro. Usa el negro casi absoluto de la paleta
+ * (080808) como fondo directamente — a diferencia de las dos paletas
+ * anteriores, esta sí trae un negro real, así que no hizo falta inventar
+ * ninguno para lograr un estilo bien oscuro.
+ *
+ * Rampa de luminosidad verificada a mano, monótona de punta a punta
+ * (fondo < tarjeta < borde < texto secundario < acento < texto principal):
+ *   --background (080808) < --card (231810) < --border (613D28) <
+ *   --muted-foreground (625F5D, ~3.2:1) < --accent (AE7F62, ~5.7:1) <
+ *   --foreground (FCCDAC, ~13.8:1). Todos los usos de --accent como texto
+ *   (incluidos los encabezados de columna sobre --card) cumplen AA.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Sin esto, el navegador sigue tratando la página como "clara" para lo que
+     no controlan nuestras clases: el scrollbar del navegador (no el de las
+     tablas, que ya tiene su propio estilo), el color de selección de texto,
+     el fondo de <select>/<input> nativos, etc. — quedaban con su aspecto
+     claro por defecto, una franja pálida contra un sitio por lo demás oscuro. */
+  color-scheme: dark;
+  --background: #080808;
+  --foreground: #fccdac;
+  --card: #231810;
+  --card-foreground: #fccdac;
+  --muted-foreground: #625f5d;
+  --border: #613d28;
+  --accent: #ae7f62;
+  --accent-foreground: #080808;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Carrusel de tarjetas de dólar: el track está duplicado (ver DolaresCarousel),
+   así que recorrer exactamente -50% deja la segunda copia donde arrancó la
+   primera y el loop no se nota, sea cual sea el ancho real del contenido. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Scroll interno de las tablas (ver CotizacionesTable): barra fina, en el
+   tono de acento, en vez de la barra gris default del SO. */
+.scrollbar-accent {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.scrollbar-accent::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-accent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-accent::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  border-radius: 9999px;
+}
+
+.scrollbar-accent::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

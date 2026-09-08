@@ -1,4 +1,4 @@
-import type { FilaCotizacion } from "@/lib/iol/types";
+import type { FilaCotizacion } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
 import { VariacionBadge } from "./VariacionBadge";
 
@@ -16,36 +16,51 @@ export function CotizacionesTable({
   columnaPrecio = "Último",
 }: CotizacionesTableProps) {
   if (items.length === 0) {
-    return <p className="text-gray-500">No hay cotizaciones para mostrar.</p>;
+    return (
+      <div className="flex h-[28rem] items-center justify-center rounded-lg border border-border/60">
+        <p className="text-sm text-muted-foreground">No hay cotizaciones para mostrar.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200">
-      <table className="min-w-full divide-y divide-gray-200 text-left text-sm">
-        <thead className="bg-gray-50">
+    // Alto fijo (no máximo): así todos los paneles del grid quedan parejos
+    // entre sí sin importar cuántas filas tenga cada uno.
+    <div className="scrollbar-accent h-[28rem] overflow-y-auto overflow-x-auto rounded-lg border border-border/60">
+      <table className="min-w-full divide-y divide-border/60 text-left text-xs sm:text-sm">
+        <thead className="sticky top-0 z-10 bg-card">
           <tr>
-            <th scope="col" className="px-4 py-3 font-semibold text-gray-700">
+            <th
+              scope="col"
+              className="px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
+            >
               Símbolo
             </th>
-            <th scope="col" className="px-4 py-3 text-right font-semibold text-gray-700">
+            <th
+              scope="col"
+              className="px-3 py-2 text-right text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
+            >
               {columnaPrecio}
             </th>
             {mostrarVariacion && (
-              <th scope="col" className="px-4 py-3 text-right font-semibold text-gray-700">
+              <th
+                scope="col"
+                className="px-3 py-2 text-right text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
+              >
                 Variación
               </th>
             )}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100 bg-white">
+        <tbody className="divide-y divide-border/40">
           {items.map((item) => (
-            <tr key={item.simbolo} className="hover:bg-gray-50">
-              <td className="px-4 py-3 font-medium text-gray-900">{item.simbolo}</td>
-              <td className="px-4 py-3 text-right tabular-nums">
+            <tr key={item.simbolo} className="transition-colors hover:bg-accent/5">
+              <td className="px-3 py-2 font-medium text-foreground">{item.simbolo}</td>
+              <td className="px-3 py-2 text-right font-mono tabular-nums text-foreground/90">
                 {item.ultimoPrecio !== null ? formatPrice(item.ultimoPrecio) : "-"}
               </td>
               {mostrarVariacion && (
-                <td className="px-4 py-3 text-right">
+                <td className="px-3 py-2 text-right">
                   <VariacionBadge variacion={item.variacionPorcentual} />
                 </td>
               )}

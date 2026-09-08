@@ -15,19 +15,6 @@ export interface PuntaCotizacion {
 }
 
 /**
- * Forma mínima que necesita `CotizacionesTable` (Símbolo/Último/Variación).
- * Cualquier fuente de datos que arme estos 4 campos puede usar esa tabla, no
- * hace falta que sea literalmente una cotización de IOL — así la usan tanto
- * los paneles de acciones/bonos/CEDEARs como el de cauciones.
- */
-export interface FilaCotizacion {
-  simbolo: string;
-  descripcion: string;
-  ultimoPrecio: number | null;
-  variacionPorcentual: number | null;
-}
-
-/**
  * Forma real (verificada a mano) de cada elemento dentro de `titulos` en la
  * respuesta de GET /api/v2/Cotizaciones/{instrumento}/{panel}/{pais}.
  */

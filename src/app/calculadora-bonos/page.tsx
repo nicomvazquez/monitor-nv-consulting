@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BonosCurvaSection } from "@/components/bonos/BonosCurvaSection";
 import { BonosSheetSection } from "@/components/bonos/BonosSheetSection";
 import { getBonosSheet } from "@/lib/googlesheets/bonos";
 
@@ -30,6 +31,21 @@ export default async function CalculadoraBonosPage() {
       </div>
 
       <BonosSheetSection {...bonosSheet} />
+
+      <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-2">
+        <BonosCurvaSection
+          {...bonosSheet}
+          seccion="ley local"
+          titulo="Curva de rendimientos — Ley local"
+          descripcion="TIR vs. duration de los bonos soberanos en dólares bajo ley argentina."
+        />
+        <BonosCurvaSection
+          {...bonosSheet}
+          seccion="ley new york"
+          titulo="Curva de rendimientos — Ley extranjera"
+          descripcion="TIR vs. duration de los bonos soberanos en dólares bajo ley de Nueva York."
+        />
+      </div>
     </main>
   );
 }

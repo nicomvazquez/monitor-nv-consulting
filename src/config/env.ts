@@ -15,4 +15,7 @@ export const env = {
   get iolPassword() {
     return requireEnv("IOL_PASSWORD");
   },
+  get fredApiKey() {
+    return requireEnv("FRED_API_KEY");
+  },
 };

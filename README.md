@@ -1,24 +1,28 @@
 ## Cotizaciones IOL
 
-App Next.js que consulta la API de [IOL invertirOnline](https://api.invertironline.com) desde el servidor y muestra, en un dashboard bien oscuro (marrones sobre negro casi absoluto, ver [Paleta de colores](#paleta-de-colores)), distintos paneles de mercado — todos con la misma tabla (Símbolo / Último / Variación) — dispuestos en grilla para ver la mayor cantidad posible juntas. Header y footer viven en el layout raíz, así que son compartidos por todas las páginas del sitio (hoy: la home y `/calculadora-bonos`).
+App Next.js que consulta la API de [IOL invertirOnline](https://api.invertironline.com) desde el servidor y muestra, en un dashboard blanco y negro con detalles en celeste (ver [Paleta de colores](#paleta-de-colores)), distintos paneles de mercado — todos con la misma tabla (Símbolo / Último / Variación) — dispuestos en grilla para ver la mayor cantidad posible juntas. Header y footer viven en el layout raíz, así que son compartidos por todas las páginas del sitio (hoy: la home y `/calculadora-bonos`).
 
-La home se divide en una barra lateral izquierda (indicadores macro + caución) y el contenido principal a la derecha (el resto de las tablas), en un orden fijo: Panel Líder, Bonos MEP, Letras, Bonos CER, CEDEARs y Criptomonedas. Para cambiar el orden alcanza con reordenar los bloques en `app/page.tsx` — no hay drag-and-drop ni persistencia en `localStorage` (se probó y se sacó; ver Notas de diseño).
+La home se divide en una barra lateral izquierda (caución + indicadores macro de Argentina y de EE.UU.) y el contenido principal a la derecha (el resto de las tablas), en un orden fijo: Panel Líder, Bonos MEP, Letras, Bonos CER, CEDEARs, Índices americanos, Commodities y Criptomonedas. Para cambiar el orden alcanza con reordenar los bloques en `app/page.tsx` — no hay drag-and-drop ni persistencia en `localStorage` (se probó y se sacó; ver Notas de diseño).
 
 Secciones disponibles en la home:
 
 - **Header**: sticky, con el logo, el título, la navegación a las demás páginas y el carrusel de dólares integrado (no es una sección más de la página, vive en el layout raíz).
 - **Dólares**: carrusel de tarjetas con compra/venta de cada tipo de dólar (oficial, blue, bolsa/MEP, CCL, mayorista, cripto, tarjeta), vía [dolarapi.com](https://dolarapi.com) — no es parte de la API de IOL. Gira solo, sin JS (animación CSS), y se pausa al pasar el mouse.
 - **Indicadores macro** *(barra lateral)*: riesgo país (tarjeta resaltada, vía [ArgentinaDatos](https://api.argentinadatos.com)) más reservas internacionales, inflación mensual e interanual, tasa de política monetaria, base monetaria y LELIQ/NOTALQ, vía la [API del BCRA](https://api.bcra.gob.ar) — ninguna de las dos es de IOL.
+- **Indicadores macro EE.UU.** *(barra lateral)*: espejo del panel anterior pero para EE.UU. — VIX (tarjeta resaltada, vía Yahoo Finance) más tasa de la Fed, inflación interanual (CPI), desempleo, oferta monetaria (M2) y PBI trimestral, vía [FRED](https://fred.stlouisfed.org) (API del banco central de EE.UU., requiere una API key gratuita).
 - **Caución** *(barra lateral)*: la tasa promedio operada a 1, 7 y 14 días, en pesos y en dólares (una fila por combinación, ordenadas por plazo). Se muestra como lista compacta, con el mismo formato que los indicadores macro (no la tabla con columnas de los demás paneles).
 - **Criptomonedas**: BTC, ETH, BNB, XRP, SOL y ADA en USD, actualizadas en vivo por WebSocket de Binance (no polling) — tampoco es de IOL.
 - **Panel Líder**: acciones argentinas del panel líder (Merval).
 - **CEDEARs principales**: los CEDEARs más operados del día (por `cantidadOperaciones`).
+- **Índices americanos**: S&P 500, Dow Jones, Nasdaq Composite y Russell 2000 — vía Yahoo Finance, no de IOL (que solo expone acciones/ETFs/bonos/monedas de EE.UU., sin un instrumento de índices). El VIX no está acá: vive en "Indicadores macro EE.UU." (es un gauge de riesgo, no un índice bursátil).
+- **Commodities**: oro, petróleo WTI, soja, maíz y trigo (futuros, vía Yahoo Finance) — soja/maíz/trigo en vez de una selección genérica, por su peso en las exportaciones argentinas.
 - **Bonos soberanos en dólares (MEP)**: Bonares (AL), Globales (GD), Discount (AE), Par (PAY) y Bonos del Tesoro en USD (AN, AO), solo liquidación MEP (se excluye la liquidación dólar cable/CCL).
 - **Letras**: LECAPs y LECER del Tesoro Nacional en pesos (excluye pagarés/cheques privados, letras provinciales y dollar-linked).
 - **Bonos CER**: Boncer y demás deuda del Tesoro Nacional en pesos ajustada por CER.
 
-En `/calculadora-bonos` (por ahora solo una tabla de referencia, la calculadora interactiva viene después):
+En `/calculadora-bonos` (por ahora tabla + curva de referencia, la calculadora interactiva viene después):
 
+- **Curvas de rendimientos — Ley local / Ley extranjera**: debajo de la tabla, una al lado de la otra, TIR vs. duration de cada sección de la hoja (SVG a mano, sin librería de gráficos), con la curva de regresión ajustada (no solo une los puntos), cada bono marcado en un color según rinda por encima o por debajo de esa curva (relativamente barato/caro para su duration), y estadísticas del ajuste (R², TIR promedio, desvío estándar, cantidad de bonos baratos/caros). Mismo borde (`rounded-lg border border-border/60`) que usan las tablas de cotizaciones.
 - **Bonos en dólares**: precio, TIR, próximo pago, duration y convexidad de Bonares/Globales, agrupados por "ley local" / "ley new york" — vía una hoja de Google Sheets del usuario (compartida como "cualquiera con el link puede ver"), no de IOL ni de ninguna otra API.
 
 ### Estructura
@@ -30,15 +34,20 @@ src/
     layout.tsx                   # Fuentes, paleta de colores, y el Header/Footer compartidos (pide dólares acá)
     globals.css                   # Tokens de color (--color-background/--color-accent/...) y @keyframes marquee
     calculadora-bonos/
-      page.tsx                    # Tabla de referencia (hoja de Google Sheets); la calculadora interactiva viene después
+      page.tsx                    # Curva + tabla de referencia (hoja de Google Sheets); la calculadora interactiva viene después
   components/
     layout/
       Header.tsx                  # Header sticky: logo (linkea a "/") + nav + carrusel de dólares embebido
-      Footer.tsx                   # Créditos de fuentes + disclaimer, al pie de la página
+      Footer.tsx                   # Marca + navegación + contacto, créditos de fuentes, disclaimer y copyright
+      Logo.tsx                     # Ícono SVG compartido por Header y Footer (antes duplicado en los dos)
+      NavLink.tsx                  # "use client": Link que se resalta en accent cuando la ruta actual coincide
       Sidebar.tsx                  # Barra lateral izquierda de la home: caución + indicadores macro (misma altura de fila)
     ui/
       ErrorMessage.tsx             # Marca de error compartida por todas las secciones (evita repetir el mismo div 4 veces)
-    bonos/                         # UI de la tabla de bonos de Google Sheets, en /calculadora-bonos
+    bonos/                         # UI de la hoja de bonos de Google Sheets, en /calculadora-bonos
+      BonosCurvaSection.tsx         # Header + estado de error + gráfico (título/sección configurables: se usa 2 veces)
+      BonosCurvaChart.tsx            # SVG a mano, con borde igual al de las tablas: TIR vs. duration + curva de
+                                      # regresión + estadísticas (usa lib/regresion.ts)
       BonosSheetSection.tsx         # Header + estado de error + tabla
       BonosSheetTable.tsx            # Tabla con sub-encabezados de sección ("Ley local"/"Ley new york")
     cotizaciones/                # UI compartida por todos los paneles de cotizaciones
@@ -57,10 +66,15 @@ src/
       MacroSection.tsx              # Mismo patrón que PanelSection/CaucionSection: header + lista de filas divididas
       MacroCard.tsx                  # Fila compacta (no tarjeta): label+fecha a la izquierda, valor en mono a la derecha
       RiesgoPaisCard.tsx             # Fila destacada (fondo/borde en el color de acento) que encabeza la lista
+    macroUsa/                     # Igual que macro/, pero genérico (FilaIndicador) en vez de atado a BcraVariable
+      MacroUsaSection.tsx            # Mismo patrón: header + lista de filas divididas
+      IndicadorRow.tsx                # Fila compacta (recibe el valor ya formateado como texto)
+      VixRow.tsx                      # Fila destacada que encabeza la lista (equivalente a RiesgoPaisCard)
   lib/
-    types.ts              # FilaCotizacion: la forma que pide CotizacionesTable, sin atarse a ninguna fuente
+    types.ts              # FilaCotizacion (tablas) y FilaIndicador (paneles tipo lista), sin atarse a ninguna fuente
     format.ts             # Formateo de números/porcentajes
     csv.ts                # parseCsv(): parser mínimo de CSV (comillas, comas escapadas), sin dependencias externas
+    regresion.ts           # ajustarCurva()/r2()/media()/desvioEstandar(): regresión cuadrática por mínimos cuadrados, sin dependencias externas
     iol/                  # Todo lo relacionado a la API de IOL
       config.ts           # URLs base y constantes de panel/instrumento/país
       auth.ts              # Login y cacheo en memoria del access token
@@ -89,6 +103,17 @@ src/
       config.ts             # ID de la hoja, URL de exportación CSV, intervalo de revalidación
       bonos.ts                # getBonosSheet(): descarga el CSV, detecta secciones/encabezado y arma BonoFila[]
       types.ts                 # BonoFila
+    yahoofinance/         # Índices americanos, commodities y VIX, vía Yahoo Finance (independiente de IOL)
+      config.ts             # Tickers a mostrar (de los tres), User-Agent requerido, intervalo de revalidación
+      cotizacion.ts           # getCotizacionYahoo()/getCotizacionesYahoo(): la lógica común (un pedido por símbolo, tolera fallos individuales)
+      indices.ts               # getIndicesAmericanos()
+      commodities.ts           # getCommodities()
+      vix.ts                   # getVix(): igual que los anteriores, pero devuelve un FilaIndicador (va en el panel macro de EE.UU., no en una tabla)
+      types.ts                 # Forma de la respuesta de /v8/finance/chart
+    fred/                 # Indicadores macro de EE.UU., vía la API del banco central (independiente de IOL)
+      config.ts             # URL base + intervalo de revalidación
+      macro.ts                # getIndicadoresMacroUsa(): un pedido por serie, tolera fallos individuales (como Yahoo)
+      types.ts                 # Forma de la respuesta de /fred/series/observations
   config/
     env.ts               # Lectura validada de variables de entorno
 ```
@@ -108,12 +133,13 @@ Para sumar un panel nuevo alcanza con: una función que devuelva
 
 ### Configuración
 
-1. Necesitás una cuenta de IOL con la API habilitada (se activa desde Configuración > API en la plataforma).
+1. Necesitás una cuenta de IOL con la API habilitada (se activa desde Configuración > API en la plataforma) y una API key de [FRED](https://fred.stlouisfed.org/docs/api/api_key.html) (gratis, alta instantánea — crear cuenta y pedirla en esa misma página).
 2. Copiá `.env.local.example` a `.env.local` y completá tus credenciales:
 
    ```
    IOL_USERNAME=tu_usuario
    IOL_PASSWORD=tu_contraseña
+   FRED_API_KEY=tu_clave_de_fred
    ```
 
 3. Instalá dependencias y corré en desarrollo:
@@ -254,34 +280,82 @@ Para sumar un panel nuevo alcanza con: una función que devuelva
 > `lib/googlesheets/config.ts` en vez de en variables de entorno, igual
 > criterio que las URLs base del resto de las APIs públicas del proyecto.
 
+> **Nota sobre índices americanos y commodities (`lib/yahoofinance/`):** se
+> probó primero si la propia API de IOL tenía índices — no: `estados_Unidos`
+> solo trae `Acciones`, `Bonos`, `Etfs` y `Monedas` como instrumento
+> (verificado contra el Swagger real de IOL, `GET /v2/swagger`, y contra la
+> API en vivo), sin ningún instrumento de índices ni de commodities. Yahoo
+> Finance sí los tiene, sin API key, pero con dos particularidades
+> verificadas a mano:
+> - El endpoint por defecto de `fetch`/`curl` (sin un `User-Agent` de
+>   navegador) devuelve 429. Con uno de Chrome funciona sin problema — no
+>   hace falta cookies ni ningún otro header.
+> - `/v7/finance/quote`, que trae varios símbolos en un solo pedido, ahora
+>   exige autenticación (`"Unauthorized"`). Por eso `getCotizacionesYahoo()`
+>   (la lógica compartida entre `getIndicesAmericanos()` y
+>   `getCommodities()`) pide cada símbolo por separado contra
+>   `/v8/finance/chart/{ticker}` (un `Promise.allSettled`, no `Promise.all`:
+>   si uno falla, los demás se muestran igual — recién si fallan todos se
+>   considera que el panel entero falló).
+>
+> Los commodities son futuros (sufijo `=F` en el ticker de Yahoo): oro y
+> petróleo WTI como referencia general, y soja/maíz/trigo en vez de una
+> selección genérica, por su peso en las exportaciones argentinas.
+
+> **Nota sobre los indicadores macro de EE.UU. (`lib/fred/`):** espejo del
+> panel de BCRA, pero para EE.UU. — mismo formato visual (`components/macroUsa/`,
+> calcado de `components/macro/` pero genérico vía `FilaIndicador` en vez de
+> atado a `BcraVariable`). FRED, a diferencia de la API del BCRA, no tiene un
+> endpoint que traiga varias series en un solo pedido: `getIndicadoresMacroUsa()`
+> pide una por una (mismo criterio que Yahoo Finance — `Promise.allSettled`,
+> tolera fallos individuales). El VIX no sale de FRED: se pide aparte a Yahoo
+> Finance (`getVix()`, reusa `getCotizacionYahoo()` de `lib/yahoofinance/`) y
+> encabeza la lista como fila destacada, igual que Riesgo País en el panel
+> argentino.
+>
+> Dos detalles de las series elegidas:
+> - La inflación interanual (CPI) usa el parámetro `units=pc1` de la propia
+>   API de FRED, que devuelve directamente la variación % contra el mismo
+>   mes del año anterior — no hace falta pedir el índice bruto y calcular el
+>   % a mano.
+> - Las fechas de FRED son siempre el día 1 del período (series
+>   mensuales/trimestrales, ej. `"2026-08-01"`): se muestran como `MM/AAAA`
+>   en vez de `DD/MM/AAAA`, para no insinuar una precisión diaria que el
+>   dato no tiene.
+>
+> `FRED_API_KEY` es la única credencial del proyecto además de las de IOL:
+> se pide gratis y al instante en fred.stlouisfed.org, y se lee vía
+> `config/env.ts` (nunca hardcodeada, mismo criterio que `IOL_USERNAME`/`IOL_PASSWORD`).
+
 ### Deploy en Vercel
 
 1. Subí el repo a GitHub/GitLab/Bitbucket y conectalo en Vercel, o corré `vercel` desde la CLI.
-2. Configurá `IOL_USERNAME` e `IOL_PASSWORD` como variables de entorno del proyecto en Vercel (Project Settings → Environment Variables). Nunca subas `.env.local`.
+2. Configurá `IOL_USERNAME`, `IOL_PASSWORD` y `FRED_API_KEY` como variables de entorno del proyecto en Vercel (Project Settings → Environment Variables). Nunca subas `.env.local`.
 3. Deploy. La página se sirve como server component; el fetch a IOL corre en el servidor de Vercel, no en el browser, así que las credenciales nunca llegan al cliente.
 
 ### Paleta de colores
 
 Toda la UI usa variables CSS semánticas (`--background`, `--foreground`, `--card`, `--muted-foreground`, `--border`, `--accent`, definidas en `app/globals.css` y mapeadas a colores de Tailwind vía `@theme inline`); ningún componente tiene un hex hardcodeado. Cambiar la paleta entera del sitio es, literalmente, editar esas variables en un solo archivo.
 
-Paleta actual (marrones + negro puro), usada **tal cual**, sin agregar ningún tono:
+Paleta actual (blanco y negro, con celeste como único detalle de color):
 
-| Variable | Hex (paleta, sin modificar) |
+| Variable | Hex |
 |---|---|
-| `--background` | `#080808` |
-| `--card` | `#231810` |
-| `--border` | `#613D28` |
-| `--muted-foreground` | `#625F5D` |
-| `--accent` | `#AE7F62` |
-| `--foreground` / `--card-foreground` | `#FCCDAC` |
-| `--accent-foreground` | igual que `--background` (`#080808`) |
+| `--background` | `#0A0A0A` |
+| `--card` | `#171717` |
+| `--border` | `#2E2E2E` |
+| `--muted-foreground` | `#A3A3A3` |
+| `--accent` | `#8ECAE6` |
+| `--foreground` / `--card-foreground` | `#F5F5F5` |
+| `--accent-foreground` | igual que `--background` (`#0A0A0A`) |
 
-Esta paleta trae un negro casi absoluto (`080808`) entre sus 6 colores, así que se pudo usar directamente como fondo para lograr un estilo bien oscuro sin inventar nada (a diferencia de una paleta anterior, a la que le faltaba un negro real y hubo que agregarle uno). También es la primera de las cuatro paletas probadas cuya rampa de luminosidad es monótona de punta a punta sin ningún compromiso de contraste: fondo (`080808`) < tarjeta (`231810`) < borde (`613D28`) < texto secundario (`625F5D`, ~3.2:1) < acento (`AE7F62`, ~5.7:1) < texto principal (`FCCDAC`, ~13.8:1) — todos los usos de `--accent` como texto, incluidos los encabezados de columna sobre `--card` (el caso más exigente en paletas anteriores), cumplen el mínimo de accesibilidad AA (4.5:1).
+Todo el sitio es gris/blanco/negro salvo `--accent`: es el único color no neutro, y se eligió deliberadamente pálido y desaturado (un celeste suave, no un azul saturado) para que se sienta como un detalle sutil en vez de un segundo color protagonista — sigue siendo el mismo token que ya usan encabezados de columna, la fila de Riesgo País, la curva de bonos, etc., simplemente con un tono mucho menos vibrante que en paletas anteriores. Rampa de luminosidad monótona de punta a punta sin ningún compromiso de contraste: fondo (`0A0A0A`) < tarjeta (`171717`) < borde (`2E2E2E`) < texto secundario (`A3A3A3`, ~7.8:1) < acento (`8ECAE6`, ~11.1:1) < texto principal (`F5F5F5`, ~18.2:1) — todo cumple AA con margen de sobra, incluidos los encabezados de columna sobre `--card` (el caso más exigente en paletas anteriores).
 
 `:root` también declara `color-scheme: dark`. Sin eso, el navegador sigue asumiendo que la página es "clara" para todo lo que no pintan nuestras propias clases — el scrollbar del navegador (el de toda la ventana; el de las tablas ya tiene su propio estilo vía `.scrollbar-accent`), el color de selección de texto, controles nativos — y esos quedaban con su apariencia clara por defecto, una franja pálida notoria contra un sitio por lo demás oscuro.
 
 ### Notas de diseño
 
+- El año del copyright en `Footer.tsx` es una constante fija (`AÑO = 2026`), no `new Date().getFullYear()`. El footer se renderiza en el layout raíz, o sea en todas las páginas: calcularlo en cada request forzaría a Next a tratar toda la app como dinámica, perdiendo el prerenderizado estático que hoy tiene `/calculadora-bonos`. Hay que actualizarlo a mano una vez por año.
 - Ningún panel/sección va envuelto en una tarjeta (borde+fondo+sombra): es un diseño deliberadamente plano — título y contenido flotan directo sobre el fondo de la página, y el único borde visible es el propio de cada tabla/lista (necesario para delimitar su scroll interno). `PanelSection`, `MacroSection`, `CaucionSection` y `CryptoLivePanel` comparten esa misma estructura simple (`header` + contenido, sin envoltorio).
 - El texto secundario muy chico (fechas, descripciones, labels de Compra/Venta) usa un único tamaño (`text-[0.7rem]`) en toda la app, en vez de mezclar 0.6rem/0.65rem/0.7rem sin motivo real.
 - `CotizacionesTable` usa alto **fijo** (no máximo) para su contenedor con scroll: así todos los paneles del grid principal quedan con la misma altura entre sí, sin importar si un panel tiene 6 filas y otro 30.

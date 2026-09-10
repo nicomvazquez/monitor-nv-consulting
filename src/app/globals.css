@@ -1,17 +1,16 @@
 @import "tailwindcss";
 
 /*
- * Paleta marrones + negro puro. Usa el negro casi absoluto de la paleta
- * (080808) como fondo directamente — a diferencia de las dos paletas
- * anteriores, esta sí trae un negro real, así que no hizo falta inventar
- * ninguno para lograr un estilo bien oscuro.
+ * Paleta blanco y negro: negro casi absoluto de fondo, grises para
+ * tarjeta/borde/texto secundario, blanco para el texto principal, y un
+ * celeste bien pálido y desaturado (8ECAE6) como único toque de color — a
+ * propósito no muy saturado, para que lea como un detalle sutil y no como un
+ * segundo color protagonista.
  *
- * Rampa de luminosidad verificada a mano, monótona de punta a punta
- * (fondo < tarjeta < borde < texto secundario < acento < texto principal):
- *   --background (080808) < --card (231810) < --border (613D28) <
- *   --muted-foreground (625F5D, ~3.2:1) < --accent (AE7F62, ~5.7:1) <
- *   --foreground (FCCDAC, ~13.8:1). Todos los usos de --accent como texto
- *   (incluidos los encabezados de columna sobre --card) cumplen AA.
+ * Rampa de luminosidad verificada a mano, monótona de punta a punta:
+ *   --background (0A0A0A) < --card (171717) < --border (2E2E2E) <
+ *   --muted-foreground (A3A3A3, ~7.8:1) < --accent (8ECAE6, ~11.1:1) <
+ *   --foreground (F5F5F5, ~18.2:1). Todos cumplen AA sin excepción.
  */
 :root {
   /* Sin esto, el navegador sigue tratando la página como "clara" para lo que
@@ -20,14 +19,14 @@
      el fondo de <select>/<input> nativos, etc. — quedaban con su aspecto
      claro por defecto, una franja pálida contra un sitio por lo demás oscuro. */
   color-scheme: dark;
-  --background: #080808;
-  --foreground: #fccdac;
-  --card: #231810;
-  --card-foreground: #fccdac;
-  --muted-foreground: #625f5d;
-  --border: #613d28;
-  --accent: #ae7f62;
-  --accent-foreground: #080808;
+  --background: #0a0a0a;
+  --foreground: #f5f5f5;
+  --card: #171717;
+  --card-foreground: #f5f5f5;
+  --muted-foreground: #a3a3a3;
+  --border: #2e2e2e;
+  --accent: #8ecae6;
+  --accent-foreground: #0a0a0a;
 }
 
 @theme inline {

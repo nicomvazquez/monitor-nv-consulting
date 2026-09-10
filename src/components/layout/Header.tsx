@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { Dolar } from "@/lib/dolarapi/types";
 import { DolaresCarousel } from "@/components/dolares/DolaresCarousel";
+import { Logo } from "./Logo";
+import { NavLink } from "./NavLink";
 
 const ENLACES_NAV = [{ href: "/calculadora-bonos", label: "Calculadora de bonos" }];
 
@@ -10,16 +12,7 @@ export function Header({ dolares, error }: { dolares: Dolar[] | null; error: str
       <div className="mx-auto flex w-full max-w-[100rem] flex-col gap-3 px-6 py-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-3">
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              className="h-7 w-7 flex-none text-accent"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.8}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 17l5-5 4 4 8-9M15 7h5v5" />
-            </svg>
+            <Logo />
             <div>
               <h1 className="text-lg font-semibold tracking-tight text-foreground">
                 Cotizaciones<span className="text-accent">.</span>
@@ -30,13 +23,9 @@ export function Header({ dolares, error }: { dolares: Dolar[] | null; error: str
 
           <nav className="flex items-center gap-4">
             {ENLACES_NAV.map((enlace) => (
-              <Link
-                key={enlace.href}
-                href={enlace.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-accent"
-              >
+              <NavLink key={enlace.href} href={enlace.href}>
                 {enlace.label}
-              </Link>
+              </NavLink>
             ))}
           </nav>
         </div>

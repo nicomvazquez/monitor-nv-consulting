@@ -5,7 +5,7 @@ import {
   CAUCION_PLAZOS_DIAS,
   CAUCION_UMBRAL_TASA_PESOS,
 } from "./config";
-import { getRevalidateSeconds } from "./market-hours";
+import { isMercadoAbierto, revalidateSecondsPara } from "./market-hours";
 import type { CaucionesResponse, CaucionTitulo } from "./types";
 import type { FilaCotizacion } from "@/lib/types";
 
@@ -23,10 +23,11 @@ export interface FilaCaucion {
 }
 
 async function getCauciones(): Promise<CaucionTitulo[]> {
+  const mercadoAbierto = await isMercadoAbierto();
   const { instrumento, panel, pais } = CAUCIONES;
   const { titulos } = await iolFetch<CaucionesResponse>(
     `/api/v2/Cotizaciones/${instrumento}/${panel}/${pais}`,
-    { revalidateSeconds: getRevalidateSeconds() },
+    { revalidateSeconds: revalidateSecondsPara(mercadoAbierto) },
   );
   return titulos;
 }

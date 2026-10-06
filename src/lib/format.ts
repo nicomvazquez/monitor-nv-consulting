@@ -21,3 +21,13 @@ export function formatPercent(value: number): string {
 export function formatTasa(value: number): string {
   return `${numberFormatter.format(value)}%`;
 }
+
+const volumenAbreviadoFormatter = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 });
+
+/** Volumen abreviado (ej. "48,3M"): el número crudo tiene demasiados dígitos para una columna angosta. */
+export function formatVolumen(value: number): string {
+  if (value >= 1_000_000_000) return `${volumenAbreviadoFormatter.format(value / 1_000_000_000)}B`;
+  if (value >= 1_000_000) return `${volumenAbreviadoFormatter.format(value / 1_000_000)}M`;
+  if (value >= 1_000) return `${volumenAbreviadoFormatter.format(value / 1_000)}K`;
+  return volumenAbreviadoFormatter.format(value);
+}

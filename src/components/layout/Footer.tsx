@@ -7,6 +7,17 @@ import { Logo } from "./Logo";
 // prerenderizado estático que hoy tiene /calculadora-bonos.
 const AÑO = 2026;
 
+const FUENTES = [
+  { nombre: "IOL", href: "https://www.invertironline.com" },
+  { nombre: "dolarapi.com", href: "https://dolarapi.com" },
+  { nombre: "BCRA", href: "https://www.bcra.gob.ar" },
+  { nombre: "ArgentinaDatos", href: "https://api.argentinadatos.com" },
+  { nombre: "Binance", href: "https://www.binance.com" },
+  { nombre: "Yahoo Finance", href: "https://finance.yahoo.com" },
+  { nombre: "FRED", href: "https://fred.stlouisfed.org" },
+  { nombre: "Google Sheets", href: "https://workspace.google.com/products/sheets/" },
+];
+
 export function Footer() {
   return (
     <footer className="border-t border-accent/15 bg-background/95">
@@ -14,7 +25,7 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <Logo className="h-5 w-5" />
+              <Logo className="h-5 w-auto" />
               <span className="text-sm font-semibold text-foreground">
                 Cotizaciones<span className="text-accent">.</span>
               </span>
@@ -55,54 +66,24 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-1 border-t border-border/40 pt-6 text-center text-xs text-muted-foreground">
-          <p>
-            Datos vía{" "}
-            <a
-              href="https://www.invertironline.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-accent"
-            >
-              IOL
-            </a>
-            ,{" "}
-            <a href="https://dolarapi.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent">
-              dolarapi.com
-            </a>
-            ,{" "}
-            <a
-              href="https://www.bcra.gob.ar"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-accent"
-            >
-              BCRA
-            </a>
-            ,{" "}
-            <a
-              href="https://www.binance.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-accent"
-            >
-              Binance
-            </a>{" "}
-            y{" "}
-            <a
-              href="https://api.argentinadatos.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-accent"
-            >
-              ArgentinaDatos
-            </a>
-            .
+        <div className="flex flex-col items-center gap-3 border-t border-border/40 pt-6 text-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[0.7rem] text-muted-foreground/70">
+            <span className="uppercase tracking-wide">Fuentes</span>
+            {FUENTES.map((fuente) => (
+              <a
+                key={fuente.href}
+                href={fuente.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-accent"
+              >
+                {fuente.nombre}
+              </a>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground/60">
+            Información con fines de referencia, no constituye asesoramiento financiero. © {AÑO} Nicolás Vázquez
           </p>
-          <p className="text-muted-foreground/60">
-            Información con fines de referencia, no constituye asesoramiento financiero.
-          </p>
-          <p className="text-muted-foreground/60">© {AÑO} Nicolás Vázquez</p>
         </div>
       </div>
     </footer>

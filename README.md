@@ -8,9 +8,10 @@ Secciones disponibles en la home:
 
 - **Header**: sticky, con el logo, el título, la navegación a las demás páginas y el carrusel de dólares integrado (no es una sección más de la página, vive en el layout raíz).
 - **Dólares**: carrusel de tarjetas con compra/venta de cada tipo de dólar (oficial, blue, bolsa/MEP, CCL, mayorista, cripto, tarjeta), vía [dolarapi.com](https://dolarapi.com) — no es parte de la API de IOL. Gira solo, sin JS (animación CSS), y se pausa al pasar el mouse.
-- **Indicadores macro** *(barra lateral)*: riesgo país (tarjeta resaltada, vía [ArgentinaDatos](https://api.argentinadatos.com)) más reservas internacionales, inflación mensual e interanual, tasa de política monetaria, base monetaria y LELIQ/NOTALQ, vía la [API del BCRA](https://api.bcra.gob.ar) — ninguna de las dos es de IOL.
-- **Indicadores macro EE.UU.** *(barra lateral)*: espejo del panel anterior pero para EE.UU. — VIX (tarjeta resaltada, vía Yahoo Finance) más tasa de la Fed, inflación interanual (CPI), desempleo, oferta monetaria (M2) y PBI trimestral, vía [FRED](https://fred.stlouisfed.org) (API del banco central de EE.UU., requiere una API key gratuita).
+- **Indicadores macro** *(barra lateral)*: riesgo país (tarjeta resaltada, vía [ArgentinaDatos](https://api.argentinadatos.com)) más reservas internacionales, inflación mensual e interanual, tasa de política monetaria, tasa BADLAR de bancos privados y base monetaria, vía la [API del BCRA](https://api.bcra.gob.ar), y UVA (también de ArgentinaDatos) — ninguna de las tres es de IOL.
+- **Indicadores macro EE.UU.** *(barra lateral)*: espejo del panel anterior pero para EE.UU. — VIX (tarjeta resaltada, vía Yahoo Finance) más tasa de la Fed, inflación interanual (CPI), desempleo, oferta monetaria (M2), PBI trimestral y el rendimiento del bono del Tesoro a 10 años (la "tasa libre de riesgo" de referencia global), vía [FRED](https://fred.stlouisfed.org) (API del banco central de EE.UU., requiere una API key gratuita).
 - **Caución** *(barra lateral)*: la tasa promedio operada a 1, 7 y 14 días, en pesos y en dólares (una fila por combinación, ordenadas por plazo). Se muestra como lista compacta, con el mismo formato que los indicadores macro (no la tabla con columnas de los demás paneles).
+- **Descargar reporte (PDF)** *(barra lateral, arriba de Caución)*: genera y descarga un PDF de una plantilla fija con todos los paneles de la home (ver [Reporte de cierre en PDF](#reporte-de-cierre-en-pdf)).
 - **Criptomonedas**: BTC, ETH, BNB, XRP, SOL y ADA en USD, actualizadas en vivo por WebSocket de Binance (no polling) — tampoco es de IOL.
 - **Panel Líder**: acciones argentinas del panel líder (Merval).
 - **CEDEARs principales**: los CEDEARs más operados del día (por `cantidadOperaciones`).
@@ -20,7 +21,7 @@ Secciones disponibles en la home:
 - **Letras**: LECAPs y LECER del Tesoro Nacional en pesos (excluye pagarés/cheques privados, letras provinciales y dollar-linked).
 - **Bonos CER**: Boncer y demás deuda del Tesoro Nacional en pesos ajustada por CER.
 
-En `/calculadora-bonos` (por ahora tabla + curva de referencia, la calculadora interactiva viene después):
+En `/calculadora-bonos`:
 
 - **Curvas de rendimientos — Ley local / Ley extranjera**: debajo de la tabla, una al lado de la otra, TIR vs. duration de cada sección de la hoja (SVG a mano, sin librería de gráficos), con la curva de regresión ajustada (no solo une los puntos), cada bono marcado en un color según rinda por encima o por debajo de esa curva (relativamente barato/caro para su duration), y estadísticas del ajuste (R², TIR promedio, desvío estándar, cantidad de bonos baratos/caros). Mismo borde (`rounded-lg border border-border/60`) que usan las tablas de cotizaciones.
 - **Bonos en dólares**: precio, TIR, próximo pago, duration y convexidad de Bonares/Globales, agrupados por "ley local" / "ley new york" — vía una hoja de Google Sheets del usuario (compartida como "cualquiera con el link puede ver"), no de IOL ni de ninguna otra API.
@@ -35,11 +36,16 @@ src/
     globals.css                   # Tokens de color (--color-background/--color-accent/...) y @keyframes marquee
     calculadora-bonos/
       page.tsx                    # Curva + tabla de referencia (hoja de Google Sheets); la calculadora interactiva viene después
+    api/
+      reporte-cierre/
+        route.ts                  # GET: devuelve el reporte guardado del último cierre (o lo genera si falta)
+      cron/reporte-cierre/
+        route.ts                  # GET protegido con CRON_SECRET: genera y guarda el reporte del día
   components/
     layout/
       Header.tsx                  # Header sticky: logo (linkea a "/") + nav + carrusel de dólares embebido
       Footer.tsx                   # Marca + navegación + contacto, créditos de fuentes, disclaimer y copyright
-      Logo.tsx                     # Ícono SVG compartido por Header y Footer (antes duplicado en los dos)
+      Logo.tsx                     # `next/image` de public/logo.png, compartido por Header (priority) y Footer
       NavLink.tsx                  # "use client": Link que se resalta en accent cuando la ruta actual coincide
       Sidebar.tsx                  # Barra lateral izquierda de la home: caución + indicadores macro (misma altura de fila)
     ui/
@@ -52,16 +58,19 @@ src/
       BonosSheetTable.tsx            # Tabla con sub-encabezados de sección ("Ley local"/"Ley new york")
     cotizaciones/                # UI compartida por todos los paneles de cotizaciones
       PanelSection.tsx           # Tarjeta de dashboard: título + estado de error + tabla de un panel
-      CotizacionesTable.tsx      # Tabla Símbolo/Último/Variación (recibe FilaCotizacion[])
+      CotizacionesTable.tsx      # Tabla Símbolo/Último/Variación/Volumen (recibe FilaCotizacion[])
       VariacionBadge.tsx
     caucion/                      # UI de la caución, como lista compacta (no la tabla del resto de paneles)
       CaucionSection.tsx           # Mismo patrón que PanelSection/MacroSection: header + lista, sin tarjeta envolvente
-      CaucionList.tsx               # Filas símbolo+descripción / tasa, igual formato visual que MacroCard
+      CaucionList.tsx               # Filas símbolo+tasa, igual formato visual que MacroCard
     dolares/                     # UI de las tarjetas de dólar (dolarapi.com), usadas dentro del Header
       DolaresCarousel.tsx         # Loop infinito por CSS (@keyframes marquee en globals.css)
       DolarCard.tsx
     cryptos/
       CryptoLivePanel.tsx          # "use client": arranca en `inicial` y se actualiza por WebSocket
+    reportes/                    # Reporte de cierre en PDF (ver sección propia más abajo)
+      DescargarReporteButton.tsx   # "use client": botón de la barra lateral, pide el PDF y dispara la descarga
+      ReporteCierreDocument.tsx    # Plantilla del PDF (primitivas de @react-pdf/renderer, no HTML)
     macro/                        # UI de la lista de indicadores del BCRA + riesgo país
       MacroSection.tsx              # Mismo patrón que PanelSection/CaucionSection: header + lista de filas divididas
       MacroCard.tsx                  # Fila compacta (no tarjeta): label+fecha a la izquierda, valor en mono a la derecha
@@ -72,7 +81,7 @@ src/
       VixRow.tsx                      # Fila destacada que encabeza la lista (equivalente a RiesgoPaisCard)
   lib/
     types.ts              # FilaCotizacion (tablas) y FilaIndicador (paneles tipo lista), sin atarse a ninguna fuente
-    format.ts             # Formateo de números/porcentajes
+    format.ts             # Formateo de números/porcentajes/volumen
     csv.ts                # parseCsv(): parser mínimo de CSV (comillas, comas escapadas), sin dependencias externas
     regresion.ts           # ajustarCurva()/r2()/media()/desvioEstandar(): regresión cuadrática por mínimos cuadrados, sin dependencias externas
     iol/                  # Todo lo relacionado a la API de IOL
@@ -114,6 +123,10 @@ src/
       config.ts             # URL base + intervalo de revalidación
       macro.ts                # getIndicadoresMacroUsa(): un pedido por serie, tolera fallos individuales (como Yahoo)
       types.ts                 # Forma de la respuesta de /fred/series/observations
+    reportes/             # Datos para el reporte de cierre en PDF (junta lo que ya exponen los demás lib/*)
+      datosReporte.ts        # getDatosReporte(): pide todo en paralelo, tolera fallos por sección (como app/page.tsx)
+      noticias.ts             # getTitulares(): titulares de prensa recientes (RSS de Google Noticias)
+      resumenIA.ts            # getResumenIA(): mini informe redactado por Gemini con datos + titulares
   config/
     env.ts               # Lectura validada de variables de entorno
 ```
@@ -140,6 +153,7 @@ Para sumar un panel nuevo alcanza con: una función que devuelva
    IOL_USERNAME=tu_usuario
    IOL_PASSWORD=tu_contraseña
    FRED_API_KEY=tu_clave_de_fred
+   GEMINI_API_KEY=tu_clave_de_gemini   # opcional: resumen con IA en el reporte PDF
    ```
 
 3. Instalá dependencias y corré en desarrollo:
@@ -245,17 +259,29 @@ Para sumar un panel nuevo alcanza con: una función que devuelva
 > `GET /estadisticas/v4.0/monetarias`, que lista las ~1600 series
 > monetarias del BCRA y ya trae el último valor informado
 > (`ultValorInformado`) y su fecha (`ultFechaInformada`) para cada una — no
-> hace falta pedir cada serie por separado. Se filtra a los 6 IDs pedidos
+> hace falta pedir cada serie por separado. Se filtra a los IDs pedidos
 > (`MACRO_IDS` en `lib/bcra/config.ts`; agregar/sacar uno es tocar ese
 > array) y se ordena según ese mismo orden.
 >
-> Dos cosas a tener en cuenta:
+> Tres cosas a tener en cuenta:
 > - Son series diarias/mensuales, no algo que valga la pena revisar cada
 >   minuto: revalida cada 30 minutos (`REVALIDATE_SECONDS_MACRO`).
 > - El id 160 (tasa de política monetaria) no se actualiza desde julio de
 >   2025 — verificado a mano contra la API real, no es un bug del código.
 >   La tarjeta lo muestra igual, con su fecha ("Al DD/MM/AAAA") a la vista
->   para que quede claro que está desactualizado.
+>   para que quede claro que está desactualizado. Por eso se sumó también el
+>   id 139 (BADLAR de bancos privados), que sí sigue actualizándose día a
+>   día — verificado contra la API real antes de agregarlo.
+> - **UVA no es del BCRA**: `getIndicadoresMacro()` (`lib/bcra/macro.ts`) la
+>   pide aparte a ArgentinaDatos (`lib/argentinadatos/uva.ts`) y la arma como
+>   si fuera una `BcraVariable` más (con un `idVariable` negativo, `-1`, que
+>   nunca va a colisionar con un id real), para que `MacroSection`/`MacroCard`
+>   la rendericen sin tocar esos componentes. `formatValor` (en `MacroCard.tsx`
+>   y su copia en `ReporteCierreDocument.tsx`) ganó un tercer caso para
+>   `unidadExpresion: "índice"` — UVA no es ni un porcentaje ni un monto en
+>   pesos/dólares, así que mostrarlo con el formato de cualquiera de esos dos
+>   hubiera sido incorrecto. Es best-effort aparte del resto: si ArgentinaDatos
+>   falla, el panel de indicadores del BCRA se muestra igual, solo sin esa fila.
 
 > **Nota sobre la tabla de bonos (`lib/googlesheets/`):** lee directamente
 > `https://docs.google.com/spreadsheets/d/{ID}/export?format=csv`, la URL de
@@ -313,19 +339,151 @@ Para sumar un panel nuevo alcanza con: una función que devuelva
 > encabeza la lista como fila destacada, igual que Riesgo País en el panel
 > argentino.
 >
-> Dos detalles de las series elegidas:
+> Detalles de las series elegidas:
 > - La inflación interanual (CPI) usa el parámetro `units=pc1` de la propia
 >   API de FRED, que devuelve directamente la variación % contra el mismo
 >   mes del año anterior — no hace falta pedir el índice bruto y calcular el
 >   % a mano.
-> - Las fechas de FRED son siempre el día 1 del período (series
->   mensuales/trimestrales, ej. `"2026-08-01"`): se muestran como `MM/AAAA`
->   en vez de `DD/MM/AAAA`, para no insinuar una precisión diaria que el
->   dato no tiene.
+> - Las fechas de la mayoría de las series son siempre el día 1 del período
+>   (series mensuales/trimestrales, ej. `"2026-08-01"`): se muestran como
+>   `MM/AAAA` en vez de `DD/MM/AAAA`, para no insinuar una precisión diaria
+>   que el dato no tiene. La excepción es `DGS10` (rendimiento del bono del
+>   Tesoro a 10 años, la "tasa libre de riesgo" — serie diaria de verdad, no
+>   mensual con el día fijo en 1): cada `SerieFred` tiene un flag `diaria`
+>   que cambia el formateador de fecha a `DD/MM/AAAA` para esos casos.
 >
 > `FRED_API_KEY` es la única credencial del proyecto además de las de IOL:
 > se pide gratis y al instante en fred.stlouisfed.org, y se lee vía
 > `config/env.ts` (nunca hardcodeada, mismo criterio que `IOL_USERNAME`/`IOL_PASSWORD`).
+
+### Reporte de cierre en PDF
+
+El botón "Descargar reporte (PDF)" de la barra lateral (arriba de Caución)
+pide `GET /api/reporte-cierre`, que arma un PDF de una sola plantilla fija
+(`components/reportes/ReporteCierreDocument.tsx`) con todos los paneles de
+la home, en el mismo orden en que aparecen ahí: dólares, indicadores macro
+de Argentina y de EE.UU. (con riesgo país y VIX destacados), caución, panel
+líder, bonos soberanos en dólares, letras, bonos CER, CEDEARs, índices
+americanos, commodities y criptomonedas.
+
+Un par de decisiones de diseño:
+
+- **El reporte siempre muestra el último cierre real, nunca un precio en
+  vivo** — sin importar la hora a la que se genere. Esto es distinto del
+  resto del sitio, donde el mismo panel muestra "Último" (en vivo) durante
+  la rueda y "Cierre" fuera de ella. Para lograrlo, los fetchers de IOL y
+  de Yahoo Finance aceptan un segundo parámetro `modo: "auto" | "cierre"`
+  (tipo `ModoPrecio` en `lib/types.ts`): "auto" es el comportamiento de
+  siempre de la home, "cierre" fuerza siempre el último cierre —
+  `getDatosReporte()` pide todo en modo "cierre".
+  - Para IOL (`aFila` en `lib/iol/cotizaciones.ts`), "cierre" fuerza
+    `ultimoCierre` en vez de `ultimoPrecio`, aunque el mercado esté
+    operando en ese momento (en cuyo caso `ultimoCierre` es el cierre de
+    **ayer**, no el de hoy, porque hoy todavía no cerró).
+  - Para Yahoo Finance (`getCotizacionYahoo` en `lib/yahoofinance/cotizacion.ts`),
+    "cierre" usa `chartPreviousClose` en vez de `regularMarketPrice` cuando
+    el mercado de EE.UU. está operando en ese momento (se sabe comparando
+    la hora actual contra `currentTradingPeriod.regular`, que ya viene en
+    la propia respuesta de Yahoo).
+  - En ambos casos, si se fuerza "cierre" con el mercado todavía abierto,
+    la columna "Var." queda en "-" en vez de mostrar un número: la
+    variación que dan estas APIs es siempre "vs. el cierre anterior a
+    HOY", así que no le corresponde a un precio que ya es, en sí, el
+    cierre de ayer — mostrarla igual sería un dato engañoso.
+  - La fecha de ese cierre (la que se ve en el encabezado del PDF, "Cierre
+    del ...") se calcula aparte con `getFechaUltimoCierre()`
+    (`lib/iol/market-hours.ts`): hoy si el mercado ya cerró por hoy, o el
+    último día hábil anterior si todavía no cerró.
+  - Caución, dólares, criptomonedas y los indicadores macro (BCRA/FRED/
+    riesgo país) no tienen esta dualidad en vivo/cierre para empezar (ver
+    las notas de cada uno más arriba), así que no participan de `modo` —
+    el PDF lo aclara en la propia plantilla (subtítulo de cada sección).
+- **El PDF se genera al momento del click, no es un archivo precalculado**:
+  la ruta no tiene `dynamic = "force-static"`, así que corre en cada
+  pedido. Es más lento que servir un archivo fijo (junta ~14 fuentes en
+  paralelo y arma el documento), por eso el botón muestra "Generando..."
+  mientras espera.
+- **La plantilla usa las primitivas de `@react-pdf/renderer`** (`Document`,
+  `Page`, `View`, `Text`, `StyleSheet`), no HTML/Tailwind: es un renderer de
+  PDF aparte, con su propio motor de layout (flexbox limitado, sin CSS
+  real). Por eso el PDF tiene su propia paleta de colores, más oscura que
+  la del sitio (`--accent` original queda demasiado pálido para texto
+  sobre fondo blanco impreso) y no reutiliza los componentes de UI del
+  dashboard.
+- **Cada sección tolera fallos individuales**, igual que la home: si una
+  fuente falla, esa sección del PDF muestra "No se pudo obtener este dato."
+  en vez de tirar abajo el reporte entero.
+- El logo no se usa en el PDF: es una "V" gris clara pensada para fondo
+  oscuro (ver Notas de diseño), así que el encabezado del PDF usa el mismo
+  wordmark de texto ("Cotizaciones.") que el resto del sitio.
+
+#### Mini informe con IA en el reporte
+
+Si está definida `GEMINI_API_KEY` (gratis en aistudio.google.com/apikey), el PDF suma
+arriba de todo un mini informe de la rueda en cuatro párrafos (panorama, eventos
+relevantes, contexto internacional, conclusión), redactado por Gemini (`lib/reportes/resumenIA.ts`, vía la Interactions API).
+Sin la clave, o si falla, el reporte se genera igual sin esa sección.
+
+- **La información extra son titulares de prensa que trae el servidor**, no búsqueda del
+  modelo: `lib/reportes/noticias.ts` lee el RSS de Google Noticias (gratis, sin clave) para
+  5 temas (Merval, riesgo país, dólar, BCRA/tasas/inflación, Wall Street) y se los pasa al
+  modelo junto con los datos de cierre. Así el informe puede explicar *por qué* se movió el
+  mercado, no solo describirlo. Se usa este camino porque la búsqueda integrada de Gemini
+  (`google_search`) da 429 (sin cuota) en el plan gratuito — verificado con dos claves
+  distintas — y Groq no ofrece búsqueda en su plan gratuito.
+- **Solo noticias del día del cierre**: la consulta se acota con `after:`/`before:` y
+  después se descarta todo titular cuya fecha de publicación (en hora Argentina) no sea
+  exactamente la fecha de cierre del reporte; además se filtran por palabras clave
+  financieras (`ES_FINANCIERO`), porque las búsquedas traen ruido de deportes o
+  espectáculos. Al modelo se le indica que use SOLO esas noticias y no agregue hechos de
+  días anteriores ni de su conocimiento previo. Si un día no hay titulares, se redacta
+  solo con los datos.
+- **Reglas del prompt**: no inventar cifras ni hechos que no estén en los datos o los
+  titulares; si un titular contradice a los datos, prevalecen los datos; no citar medios
+  ni copiar titulares. La cifra de riesgo país, por ejemplo, sale de ArgentinaDatos, no de
+  la prensa.
+- **Qué eventos son relevantes**: Google Noticias solo da título y medio (sin resumen),
+  así que la relevancia se infiere: se consultan 10 temas orientados a hechos (reservas,
+  FMI, Caputo/Milei, Fed, petróleo, etc.), y `noticias.ts` agrupa los titulares que cuentan
+  el mismo hecho (palabras clave en común) y los ordena por cobertura. Al modelo le llegan
+  primero los hechos que más medios cubrieron, marcados `[cubierto por N medios]`, hasta 40
+  titulares. El prompt le pide explicar *qué pasó, por qué importa y cómo se reflejó en los
+  precios*, sin atribuir más causalidad que la que sugieren los titulares.
+- **Modelo**: primero `gemini-3.5-flash` ("piensa": análisis mejor, 10-25 s, timeout de 30 s);
+  si falla — es común un 503 por alta demanda — cae a `gemini-3.5-flash-lite` (~2 s, timeout
+  de 15 s). El PDF indica cuál de los dos lo redactó. Con `GEMINI_MODEL` se fuerza uno solo.
+- El PDF marca la sección como redactada por IA, con el modelo, la cantidad de titulares
+  usados y la prensa consultada, porque puede contener errores.
+- Best-effort en cada capa: un tema de noticias que falla no afecta a los demás; sin
+  titulares se redacta solo con los datos; si Gemini falla no hay sección.
+- La ruta declara `maxDuration = 60`. En Vercel, agregar `GEMINI_API_KEY` en las
+  variables de entorno del entorno correspondiente (Preview y/o Production).
+
+#### Un reporte por día, guardado
+
+El reporte no se arma en cada click: hay uno por día, correspondiente al último
+cierre de mercado, que queda guardado y se sirve tal cual hasta el próximo cierre
+(`lib/reportes/reporteDiario.tsx`).
+
+- **Generación**: un cron de Vercel (`vercel.json`, `0 21 * * 1-5` UTC = 18hs Argentina,
+  de lunes a viernes) llama a `/api/cron/reporte-cierre`, que genera el PDF (con el resumen
+  de IA) y lo guarda, pisando cualquier versión previa de esa fecha. En el plan Hobby los
+  crons corren en algún momento dentro de la hora indicada, no al minuto.
+- **Descarga**: `/api/reporte-cierre` busca el guardado de la fecha del último cierre
+  (`getFechaUltimoCierre`) y lo devuelve. Si no existe (el cron falló, o es el primer día),
+  lo genera en ese momento y lo guarda, así nunca queda sin reporte.
+- **Almacenamiento** (`lib/reportes/almacenamiento.ts`): Vercel Blob privado, con una
+  clave por fecha (`reportes/reporte-cierre-AAAA-MM-DD.pdf`). Sin `BLOB_READ_WRITE_TOKEN`
+  (desarrollo local) se guarda en `.reportes/`, ignorado por git.
+- **Configuración en Vercel**: crear un Blob store en el proyecto (Storage → Blob; agrega
+  `BLOB_READ_WRITE_TOKEN` solo) y definir `CRON_SECRET` con un string largo y aleatorio.
+  Sin `CRON_SECRET` el cron rechaza todo (evita que alguien lo dispare desde afuera y
+  gaste la cuota de la IA).
+- El cron de Vercel dispara igual en un feriado (no es feriado-aware, solo sabe "lun-vie"),
+  pero `getFechaUltimoCierre()` sí lo es (ver la nota de `lib/iol/market-hours.ts` más abajo):
+  el reporte que arma ese día queda guardado con la fecha real del último cierre, no con la
+  fecha del feriado — en el peor caso se pisa el mismo archivo del día anterior con un resumen
+  de IA levemente distinto (redactado de nuevo), no se genera un reporte con fecha incorrecta.
 
 ### Deploy en Vercel
 
@@ -355,11 +513,49 @@ Todo el sitio es gris/blanco/negro salvo `--accent`: es el único color no neutr
 
 ### Notas de diseño
 
+- El logo (`public/logo.png`, 500x300, fondo transparente) se usa vía `next/image` en `Logo.tsx` — `public/` es el lugar correcto para assets estáticos en Next.js, se sirven directo desde la raíz (`/logo.png`). `favicon`/`apple-icon` (`src/app/icon.png` y `apple-icon.png`, generados con `sharp` recortando el margen transparente del original) usan fondo sólido negro en vez de transparente: la "V" gris clara del logo casi desaparece sobre blanco (el fondo de tab por defecto), pero se ve nítida sobre el mismo negro del sitio.
 - El año del copyright en `Footer.tsx` es una constante fija (`AÑO = 2026`), no `new Date().getFullYear()`. El footer se renderiza en el layout raíz, o sea en todas las páginas: calcularlo en cada request forzaría a Next a tratar toda la app como dinámica, perdiendo el prerenderizado estático que hoy tiene `/calculadora-bonos`. Hay que actualizarlo a mano una vez por año.
 - Ningún panel/sección va envuelto en una tarjeta (borde+fondo+sombra): es un diseño deliberadamente plano — título y contenido flotan directo sobre el fondo de la página, y el único borde visible es el propio de cada tabla/lista (necesario para delimitar su scroll interno). `PanelSection`, `MacroSection`, `CaucionSection` y `CryptoLivePanel` comparten esa misma estructura simple (`header` + contenido, sin envoltorio).
-- El texto secundario muy chico (fechas, descripciones, labels de Compra/Venta) usa un único tamaño (`text-[0.7rem]`) en toda la app, en vez de mezclar 0.6rem/0.65rem/0.7rem sin motivo real.
-- `CotizacionesTable` usa alto **fijo** (no máximo) para su contenedor con scroll: así todos los paneles del grid principal quedan con la misma altura entre sí, sin importar si un panel tiene 6 filas y otro 30.
-- El contenido principal de la home usa un grid CSS común (`grid-cols-1 sm:grid-cols-2 xl:grid-cols-3`) en `app/page.tsx`, en orden fijo. Antes había un reordenamiento interactivo (botones ↑/↓, orden guardado en `localStorage`, columnas calculadas a mano con `ResizeObserver`) que se sacó por pedido explícito: con todos los paneles a la misma altura fija, un grid normal ya queda parejo sin necesidad de ese cálculo manual en JS — que además era una fuente de bugs (parpadeo en el primer render, desincronización al redimensionar).
+- El texto secundario muy chico (fechas, descripciones) usa un único tamaño (`text-[0.7rem]`) en toda la app, en vez de mezclar 0.6rem/0.65rem/0.7rem sin motivo real.
+- `CotizacionesTable` usa alto **máximo** (no fijo, `max-h-[28rem]`): un panel con pocas filas (Índices, Commodities) mide lo que necesita su contenido, no los mismos 28rem que uno con 25 filas (Bonos CER) — más allá del máximo, scrollea.
+- El contenido principal de la home usa **columnas CSS** (`columns-1 sm:columns-2 xl:columns-3` en `app/page.tsx`, cada panel envuelto en un `<div className="mb-5 break-inside-avoid">`), no un grid. La diferencia importa justo por el punto anterior: en un grid, todos los paneles de una misma fila comparten alto (el más alto define el alto de la fila, dejando hueco debajo de los cortos); con columnas CSS cada panel mide lo que necesita y el siguiente panel de esa columna sube a ocupar el espacio libre, como un muro de Pinterest — sin eso, el alto variable de `max-h` no serviría de mucho. `break-inside-avoid` evita que un panel se parta entre dos columnas. Antes había un reordenamiento interactivo (botones ↑/↓, orden guardado en `localStorage`, columnas calculadas a mano con `ResizeObserver`) que se sacó por pedido explícito: era una fuente de bugs (parpadeo en el primer render, desincronización al redimensionar) para lograr algo que las columnas CSS nativas ya resuelven solas.
 - El token de acceso de IOL dura 15 minutos. `lib/iol/auth.ts` lo cachea en memoria del proceso (por instancia serverless) para no pedir uno nuevo en cada request.
 - Los datos del panel usan ISR (`next.revalidate` en `lib/iol/client.ts`): Next.js no hace polling en segundo plano, solo vuelve a pedir los datos cuando, pasado ese tiempo, entra una visita nueva. El gasto real de pedidos depende de cuánta gente visita la página, no de un timer corriendo solo.
 - El intervalo de revalidación es dinámico (`lib/iol/market-hours.ts`): **60s** mientras el mercado está operando (lun-vie 11 a 17hs, hora Argentina) y **30 minutos** fuera de ese horario, ya que de noche o el fin de semana los precios no se mueven. Ajustar `REVALIDATE_SECONDS_MERCADO_ABIERTO` / `REVALIDATE_SECONDS_MERCADO_CERRADO` en `lib/iol/config.ts` si hace falta afinar el consumo mensual de la API.
+- Cada página tiene exactamente un `<h1>` (regla de accesibilidad): en `/calculadora-bonos` es el título visible de la página, pero en la home ese lugar ya lo ocupaba visualmente el nombre del sitio en el Header — como el Header vive en el layout raíz y se repite en todas las páginas, ese texto pasó a ser un `<p>`, y la home agrega su propio `<h1 className="sr-only">` (visualmente oculto, pero presente para lectores de pantalla y SEO) describiendo el contenido de esa página en particular.
+- Metadata (`title`/`description`/Open Graph) está centralizada: `app/layout.tsx` define un `title.template` (`"%s — Cotizaciones"`) y una descripción general del sitio entero; cada página solo exporta su propio `title`/`description` puntual (ej. `/calculadora-bonos`) y Next arma el resto. Deliberadamente no se seteó `metadataBase` ni una imagen de Open Graph todavía — falta definir el dominio de producción y generar un asset dedicado.
+- Los mensajes de error que ve el usuario son siempre genéricos y en español ("No se pudieron cargar los datos de este panel. Probá recargar la página en unos minutos."), nunca el detalle técnico real (status HTTP, símbolo que falló, etc.), que en cambio se loguea server-side vía `console.error` con el nombre del panel como tag (ej. `[indices-americanos]`) — así queda accionable en los logs de Vercel sin exponerle nada al visitante que no pueda hacer nada con esa información.
+- Los títulos/descripciones de cada panel (en `app/page.tsx` y en los `*Section.tsx`) no mencionan la fuente de datos (IOL, Yahoo Finance, BCRA, etc.) — es ruido para quien solo quiere ver la cotización. Todas las fuentes viven en un único lugar: la lista compacta de links al pie del `Footer` (`FUENTES` en `Footer.tsx`), separada del disclaimer/copyright.
+- **Pasada de densidad** (tomando como referencia visual un terminal de trading tipo Bloomberg, solo en el eje "más comprimido", sin sumar elementos que no aplican a un sitio de solo consulta como libro de profundidad o botones de orden): primero se probó convertir caución/indicadores macro en una grilla de tiles de 2 columnas, pero se volvió atrás a la lista de filas original (se simplifica mejor, y un valor largo como `"$ 46.262.060,00 M"` no tiene problema para entrar en una fila de ancho completo como sí lo tenía en un tile angosto de ~130px). Lo que sí quedó de esa pasada:
+  - Las filas de `CotizacionesTable` bajaron su padding (`py-2` → `py-1`) para que entren más símbolos sin scroll.
+  - El layout principal pasó de grid a columnas CSS con `max-h` en vez de alto fijo (ver las dos notas de arriba) — esto es lo que realmente ahorra espacio en blanco, no la densidad de cada fila.
+  - El Header se achicó (logo+título en una sola línea, sin la bajada "Mercado argentino en vivo"; la tarjeta de cada dólar en el carrusel pasó de dos columnas con labels "Compra"/"Venta" a un solo renglón `$compra / $venta` — la posición ya identifica cuál es cuál, y el `title="Compra / Venta"` del `<dl>` más los `<dt className="sr-only">` conservan el significado para lectores de pantalla).
+  - Se recortaron las descripciones de panel que solo repetían el título sin sumar información (Panel Líder, Criptomonedas) o que tenían palabras de más (Bonos MEP, Letras, Bonos CER, CEDEARs, indicadores macro); `description` en `PanelSection` ahora es opcional. En `CaucionList`, la descripción por fila ("Caución a 1 día") se dejó de mostrar porque repetía lo que ya decía el símbolo ("Pesos 1D") — se sigue mostrando solo en el caso de fallback real ("más cercana operada: X días"), que sí aporta información.
+  - Un espacio irrompible (U+00A0) entre el número y la unidad en los valores de `MacroCard`/`lib/fred/macro.ts` (ej. "...46.262.060,00 M") evita que la unidad quede colgando sola en su propia línea si el texto llega a quebrar — quedó de la prueba con tiles, pero es una mejora válida igual en la lista.
+- **Columna Volumen**: `FilaCotizacion.volumen` es opcional (no todas las fuentes lo tienen) y se muestra abreviado (`formatVolumen` en `lib/format.ts`, ej. "48,3M") porque el número crudo tiene demasiados dígitos para una columna angosta. De dónde sale según la fuente:
+  - IOL: ya viene en `CotizacionPanelItem.volumen` — se pedía y se descartaba al armar la fila, no es un pedido nuevo.
+  - Yahoo Finance: `meta.regularMarketVolume`, mismo pedido que ya se hacía para precio/variación.
+  - Binance: `quoteVolume` (volumen en USDT, no en unidades de la moneda — más comparable entre BTC/ETH/etc. que mezclar "cantidad de BTC" con "cantidad de ETH"), tanto en la foto inicial (`GET /ticker/24hr`) como en vivo (`q` del stream `@ticker`).
+  - Caución no participa: no usa `CotizacionesTable`, usa `CaucionList` con su propio formato de lista.
+- **Feriados en `isMercadoAbierto()`/`getFechaUltimoCierre()`**: durante un buen tiempo estas dos
+  funciones (`lib/iol/market-hours.ts`) solo miraban fin de semana — un feriado hábil (ej. 25/12,
+  que siempre cae entre semana) hacía que el sitio pensara que el mercado estaba operando. Se
+  corrigió sumando `lib/argentinadatos/feriados.ts` (`GET /v1/feriados/{año}`, gratis, sin clave).
+  - Las dos funciones pasaron de sincrónicas a `async` (necesitan pedir el feriadario), lo que
+    obligó a tocar todos sus callers (los 5 getters de `lib/iol/cotizaciones.ts`, `lib/iol/caucion.ts`,
+    `app/page.tsx`, `lib/reportes/datosReporte.ts` y `reporteDiario.tsx`) — todos ya estaban en
+    contexto async, así que fue agregar `await`, no un rediseño.
+  - `getRevalidateSeconds()` se partió en dos: `isMercadoAbierto()` (async, hace el trabajo pesado)
+    y `revalidateSecondsPara(mercadoAbierto: boolean)` (sync, puro). Antes `aFila()` en
+    `lib/iol/cotizaciones.ts` llamaba a `isMercadoAbierto()` una vez por fila (desperdicio, aunque
+    barato siendo sync); ahora cada getter la resuelve una sola vez por request y se la pasa a
+    `aFila()` como parámetro, evitando N pedidos de feriados redundantes por el mismo resultado.
+  - `getFechaUltimoCierre()` necesita poder caminar hacia atrás por una cadena de feriado+fin de
+    semana consecutivos (ej. Navidad viernes → sábado → domingo), así que pide el feriadario del
+    año actual *y* el anterior en un solo paso (`feriadosAlrededorDe`, un `Promise.all`) y después
+    recorre los días hacia atrás de forma sincrónica contra ese set ya resuelto, en vez de pedir
+    feriados de nuevo en cada iteración del loop.
+  - Verificado a mano (no quedó solo como código sin probar): simulando el 25/12/2026 — feriado
+    real, viernes, dentro del horario de rueda — `isMercadoAbierto()` da `false` (antes hubiera
+    dado `true`), y `getFechaUltimoCierre()` del lunes siguiente salta correctamente feriado +
+    fin de semana y cae en el jueves anterior.

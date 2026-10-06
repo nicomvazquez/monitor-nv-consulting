@@ -3,6 +3,8 @@ export interface Binance24hrTicker {
   symbol: string;
   lastPrice: string;
   priceChangePercent: string;
+  /** Volumen de las últimas 24hs, en la moneda cotizada (USDT) — más comparable entre monedas que el volumen en unidades. */
+  quoteVolume: string;
 }
 
 /** Forma del mensaje que llega por el stream combinado `@ticker` de Binance. */
@@ -15,5 +17,7 @@ export interface BinanceTickerStreamMessage {
     c: string;
     /** Variación porcentual en las últimas 24hs. */
     P: string;
+    /** Volumen de las últimas 24hs, en USDT. */
+    q: string;
   };
 }

@@ -11,10 +11,8 @@ export function BonosSheetSection({ filas, error }: BonosSheetSectionProps) {
   return (
     <section className="flex flex-col gap-3">
       <header>
-        <h2 className="text-base font-semibold text-foreground">Bonos en dólares</h2>
-        <p className="text-xs text-muted-foreground">
-          Precio, TIR, duration y convexidad — datos de una hoja de Google Sheets.
-        </p>
+        <h2 className="text-base font-semibold text-foreground">Análisis de bonos soberanos</h2>
+        <p className="text-xs text-muted-foreground">Precio, TIR, duration y convexidad, actualizados periódicamente.</p>
       </header>
 
       {error ? <ErrorMessage>{error}</ErrorMessage> : <BonosSheetTable filas={filas ?? []} />}

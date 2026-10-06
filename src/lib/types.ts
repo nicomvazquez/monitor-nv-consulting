@@ -8,6 +8,8 @@ export interface FilaCotizacion {
   descripcion: string;
   ultimoPrecio: number | null;
   variacionPorcentual: number | null;
+  /** Opcional: no todas las fuentes lo tienen (ej. caución). En pesos/dólares/USDT según el panel. */
+  volumen?: number | null;
 }
 
 /**
@@ -22,3 +24,13 @@ export interface FilaIndicador {
   valor: string;
   fecha: string;
 }
+
+/**
+ * Cómo mostrar el precio de una cotización con concepto de mercado
+ * abierto/cerrado (IOL, Yahoo Finance): "auto" sigue el horario real del
+ * mercado (en vivo mientras opera, cierre una vez terminada la rueda — el
+ * comportamiento de siempre en la home); "cierre" fuerza siempre el último
+ * cierre real, sin importar si el mercado está operando en este momento —
+ * lo usa el reporte en PDF, que nunca debe mostrar un precio en vivo.
+ */
+export type ModoPrecio = "auto" | "cierre";

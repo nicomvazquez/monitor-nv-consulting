@@ -4,16 +4,20 @@ import { BonosSheetSection } from "@/components/bonos/BonosSheetSection";
 import { getBonosSheet } from "@/lib/googlesheets/bonos";
 
 export const metadata: Metadata = {
-  title: "Calculadora de bonos — Cotizaciones IOL",
+  title: "Calculadora de bonos",
+  description:
+    "Precio, TIR, duration y convexidad de bonos soberanos argentinos en dólares (ley local y ley " +
+    "extranjera), con curvas de rendimiento y regresión para identificar bonos relativamente baratos o caros.",
 };
 
 async function fetchBonosSheet() {
   try {
     return { filas: await getBonosSheet(), error: null as string | null };
   } catch (cause) {
+    console.error("[bonos-sheet]", cause);
     return {
       filas: null,
-      error: cause instanceof Error ? cause.message : "Error desconocido al consultar Google Sheets.",
+      error: "No se pudo cargar la tabla de bonos. Probá recargar la página en unos minutos.",
     };
   }
 }
@@ -26,7 +30,8 @@ export default async function CalculadoraBonosPage() {
       <div>
         <h1 className="text-2xl font-semibold text-foreground">Calculadora de bonos</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Por ahora, la tabla de referencia de la hoja de cálculo. La calculadora interactiva viene después.
+          Precio, TIR, duration y convexidad de bonos soberanos argentinos en dólares, con curvas de
+          rendimiento para comparar ley local y ley extranjera.
         </p>
       </div>
 

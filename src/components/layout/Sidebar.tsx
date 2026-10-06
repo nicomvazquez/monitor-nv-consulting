@@ -4,6 +4,7 @@ import type { RiesgoPais } from "@/lib/argentinadatos/types";
 import type { FilaIndicador } from "@/lib/types";
 import { MacroSection } from "@/components/macro/MacroSection";
 import { MacroUsaSection } from "@/components/macroUsa/MacroUsaSection";
+import { DescargarReporteButton } from "@/components/reportes/DescargarReporteButton";
 
 interface SidebarProps {
   indicadores: BcraVariable[] | null;
@@ -27,7 +28,8 @@ export function Sidebar({
   ...macro
 }: SidebarProps) {
   return (
-    <aside className="flex w-full flex-col gap-5 lg:w-72 lg:flex-none">
+    <aside className="flex w-full flex-col gap-4 lg:w-72 lg:flex-none">
+      <DescargarReporteButton />
       {caucion}
       <MacroSection {...macro} />
       <MacroUsaSection indicadores={indicadoresUsa} error={errorUsa} vix={vix} vixError={vixError} />

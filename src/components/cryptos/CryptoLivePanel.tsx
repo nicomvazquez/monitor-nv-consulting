@@ -29,7 +29,12 @@ export function CryptoLivePanel({ inicial }: { inicial: FilaCotizacion[] }) {
         setItems((prev) =>
           prev.map((item) =>
             item.simbolo === simbolo
-              ? { ...item, ultimoPrecio: Number(data.c), variacionPorcentual: Number(data.P) }
+              ? {
+                  ...item,
+                  ultimoPrecio: Number(data.c),
+                  variacionPorcentual: Number(data.P),
+                  volumen: Number(data.q),
+                }
               : item,
           ),
         );
@@ -52,12 +57,11 @@ export function CryptoLivePanel({ inicial }: { inicial: FilaCotizacion[] }) {
   }, []);
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-2">
       <header>
         <h2 className="text-base font-semibold text-foreground">Criptomonedas</h2>
-        <p className="text-xs text-muted-foreground">Precio en vivo (USD) vía WebSocket de Binance.</p>
       </header>
-      <CotizacionesTable items={items} />
+      <CotizacionesTable items={items} mostrarVolumen />
     </section>
   );
 }

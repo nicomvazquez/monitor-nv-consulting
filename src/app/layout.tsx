@@ -15,18 +15,33 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
+const DESCRIPCION =
+  "Dashboard financiero en vivo: acciones, bonos y CEDEARs argentinos, dólares, caución, " +
+  "criptomonedas, índices y commodities internacionales, indicadores macro de Argentina y Estados " +
+  "Unidos, y una calculadora de bonos soberanos.";
+
 export const metadata: Metadata = {
-  title: "Cotizaciones IOL",
-  description: "Cotizaciones en vivo desde la API de IOL invertirOnline.",
+  title: {
+    default: "Cotizaciones — Mercado argentino y global en vivo",
+    template: "%s — Cotizaciones",
+  },
+  description: DESCRIPCION,
+  openGraph: {
+    title: "Cotizaciones — Mercado argentino y global en vivo",
+    description: DESCRIPCION,
+    locale: "es_AR",
+    type: "website",
+  },
 };
 
 async function fetchDolares() {
   try {
     return { dolares: await getDolares(), error: null as string | null };
   } catch (cause) {
+    console.error("[dolares]", cause);
     return {
       dolares: null,
-      error: cause instanceof Error ? cause.message : "Error desconocido al consultar dolarapi.com.",
+      error: "No se pudieron cargar las cotizaciones del dólar. Probá recargar la página en unos minutos.",
     };
   }
 }

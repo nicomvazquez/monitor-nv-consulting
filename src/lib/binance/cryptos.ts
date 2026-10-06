@@ -8,6 +8,7 @@ function filasVacias(): FilaCotizacion[] {
     descripcion: CRYPTOS_NOMBRES[simbolo],
     ultimoPrecio: null,
     variacionPorcentual: null,
+    volumen: null,
   }));
 }
 
@@ -35,6 +36,7 @@ export async function getCryptosIniciales(): Promise<FilaCotizacion[]> {
         descripcion: CRYPTOS_NOMBRES[simbolo],
         ultimoPrecio: ticker ? Number(ticker.lastPrice) : null,
         variacionPorcentual: ticker ? Number(ticker.priceChangePercent) : null,
+        volumen: ticker ? Number(ticker.quoteVolume) : null,
       };
     });
   } catch {

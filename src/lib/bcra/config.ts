@@ -14,7 +14,9 @@ export const REVALIDATE_SECONDS_MACRO = 30 * 60;
  * 27  Inflación mensual
  * 28  Inflación interanual
  * 160 Tasa de interés de política monetaria
+ * 139 Tasa BADLAR de bancos privados (benchmark de depósitos en pesos — a
+ *     diferencia de la 160, sigue actualizándose día a día)
  * 15  Base monetaria
  * 155 LELIQ y NOTALQ
  */
-export const MACRO_IDS = [1, 27, 28, 160, 15] as const;
+export const MACRO_IDS = [1, 27, 28, 160, 139, 15] as const;

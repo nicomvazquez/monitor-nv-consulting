@@ -9,6 +9,8 @@ interface SerieFred {
   nombre: string;
   /** "pc1": que la propia API de FRED devuelva la variación % interanual, en vez del valor bruto. */
   unidades?: "pc1";
+  /** true: serie diaria (se muestra como DD/MM/AAAA); default: mensual/trimestral (se muestra como MM/AAAA). */
+  diaria?: boolean;
   formatear: (valor: number) => string;
 }
 
@@ -16,7 +18,10 @@ interface SerieFred {
  * Espejo del panel de indicadores del BCRA, pero para EE.UU. Series elegidas
  * a mano: tasa de política monetaria, inflación interanual (FRED calcula el
  * % directamente, sin que haga falta derivarlo del índice), desempleo,
- * oferta monetaria M2 (equivalente a "base monetaria") y PBI trimestral.
+ * oferta monetaria M2 (equivalente a "base monetaria"), PBI trimestral y el
+ * rendimiento del bono del Tesoro a 10 años (la "tasa libre de riesgo" de
+ * referencia global, comparable contra la TIR de los bonos soberanos
+ * argentinos de `/calculadora-bonos`).
  */
 const SERIES: SerieFred[] = [
   { id: "FEDFUNDS", nombre: "Tasa de la Fed", formatear: (v) => `${formatPrice(v)}%` },
@@ -27,14 +32,23 @@ const SERIES: SerieFred[] = [
     formatear: (v) => `${formatPrice(v)}%`,
   },
   { id: "UNRATE", nombre: "Desempleo", formatear: (v) => `${formatPrice(v)}%` },
-  { id: "M2SL", nombre: "Oferta monetaria (M2)", formatear: (v) => `US$ ${formatPrice(v)} MM` },
+  // Espacio irrompible antes de la unidad: en el tile angosto de la grilla de indicadores, un
+  // espacio normal ahí deja a la "MM" sola colgando en su propia línea.
+  { id: "M2SL", nombre: "Oferta monetaria (M2)", formatear: (v) => `US$ ${formatPrice(v)} MM` },
   { id: "A191RL1Q225SBEA", nombre: "PBI (trim. anualizado)", formatear: (v) => `${formatPrice(v)}%` },
+  { id: "DGS10", nombre: "Tasa libre de riesgo (UST 10Y)", diaria: true, formatear: (v) => `${formatPrice(v)}%` },
 ];
 
 /** "2026-08-01" -> "08/2026": son series mensuales/trimestrales (siempre día 01); mostrar el día sugeriría una precisión que no tienen. */
 function formatFechaMensual(fechaIso: string): string {
   const [anio, mes] = fechaIso.split("-");
   return `${mes}/${anio}`;
+}
+
+/** "2026-09-30" -> "30/09/2026": para series diarias, a diferencia de las mensuales/trimestrales. */
+function formatFechaDiaria(fechaIso: string): string {
+  const [anio, mes, dia] = fechaIso.split("-");
+  return `${dia}/${mes}/${anio}`;
 }
 
 async function getFilaFred(serie: SerieFred): Promise<FilaIndicador> {
@@ -65,7 +79,7 @@ async function getFilaFred(serie: SerieFred): Promise<FilaIndicador> {
   return {
     nombre: serie.nombre,
     valor: serie.formatear(Number(observacion.value)),
-    fecha: formatFechaMensual(observacion.date),
+    fecha: serie.diaria ? formatFechaDiaria(observacion.date) : formatFechaMensual(observacion.date),
   };
 }
 

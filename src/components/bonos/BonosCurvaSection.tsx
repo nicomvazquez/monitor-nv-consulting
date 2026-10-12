@@ -8,15 +8,13 @@ interface BonosCurvaSectionProps {
   /** Título de la sección de la hoja a graficar (ej. "ley local", "ley new york"). */
   seccion: string;
   titulo: string;
-  descripcion: string;
 }
 
-export function BonosCurvaSection({ filas, error, seccion, titulo, descripcion }: BonosCurvaSectionProps) {
+export function BonosCurvaSection({ filas, error, seccion, titulo }: BonosCurvaSectionProps) {
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-2 sm:gap-3">
       <header>
         <h2 className="text-base font-semibold text-foreground">{titulo}</h2>
-        <p className="text-xs text-muted-foreground">{descripcion}</p>
       </header>
 
       {error ? <ErrorMessage>{error}</ErrorMessage> : <BonosCurvaChart filas={filas ?? []} seccion={seccion} />}

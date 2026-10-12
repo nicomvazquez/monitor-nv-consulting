@@ -16,13 +16,14 @@ const FUENTES = [
   { nombre: "Yahoo Finance", href: "https://finance.yahoo.com" },
   { nombre: "FRED", href: "https://fred.stlouisfed.org" },
   { nombre: "Google Sheets", href: "https://workspace.google.com/products/sheets/" },
+  { nombre: "Google Noticias", href: "https://news.google.com" },
 ];
 
 export function Footer() {
   return (
     <footer className="border-t border-accent/15 bg-background/95">
-      <div className="mx-auto flex w-full max-w-[100rem] flex-col gap-8 px-6 py-10">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+      <div className="mx-auto flex w-full max-w-[100rem] flex-col gap-8 max-sm:gap-4 px-6 max-sm:px-2 py-10 max-sm:py-4">
+        <div className="grid grid-cols-1 gap-4 sm:gap-8 sm:grid-cols-3">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <Logo className="h-5 w-auto" />
@@ -31,7 +32,6 @@ export function Footer() {
               </span>
             </div>
             <p className="mt-2 text-sm font-medium text-foreground">Nicolás Vázquez</p>
-            <p className="text-xs text-muted-foreground">Desarrollo de herramientas financieras</p>
           </div>
 
           <div className="flex flex-col gap-2">

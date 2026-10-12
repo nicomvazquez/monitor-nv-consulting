@@ -85,7 +85,7 @@ export function BonosCurvaChart({ filas, seccion }: { filas: BonoFila[]; seccion
   });
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border/60 p-4">
+    <div className="flex flex-col gap-3 rounded-lg border border-border/60 p-2.5 sm:p-4">
       <svg
         viewBox={`0 0 ${ANCHO} ${ALTO}`}
         className="h-auto w-full"

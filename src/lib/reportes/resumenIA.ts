@@ -51,7 +51,7 @@ function armarDatos(datos: DatosReporte, titulares: Titular[]): string {
     `Panel Líder (cierre): ${lineas(datos.panelLider.datos, 20)}`,
     `Bonos en dólares MEP (cierre): ${lineas(datos.bonosMep.datos, 16)}`,
     `CEDEARs más operados (cierre): ${lineas(datos.cedears.datos, 10)}`,
-    `Índices EE.UU.: ${lineas(datos.indices.datos, 4)}`,
+    `Índices (Merval, Bovespa y EE.UU.): ${lineas(datos.indices.datos, 6)}`,
     `Commodities: ${lineas(datos.commodities.datos, 5)}`,
     `Cripto: ${lineas(datos.criptos.datos, 6)}`,
     "",

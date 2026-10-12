@@ -10,6 +10,13 @@ export interface FilaCotizacion {
   variacionPorcentual: number | null;
   /** Opcional: no todas las fuentes lo tienen (ej. caución). En pesos/dólares/USDT según el panel. */
   volumen?: number | null;
+  /**
+   * Cantidad de operaciones del día (solo IOL). A diferencia de `volumen`
+   * (que IOL solo informa en vivo y vuelve 0 con el mercado cerrado), esta
+   * cuenta sigue reflejando el total del día después del cierre — es la que
+   * usa el reporte para elegir "las más operadas".
+   */
+  cantidadOperaciones?: number | null;
 }
 
 /**

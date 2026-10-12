@@ -12,6 +12,11 @@ interface CotizacionesTableProps {
   columnaPrecio?: string;
 }
 
+/**
+ * En mobile (`max-sm`) los paneles van de a dos columnas, así que las columnas
+ * Variación y Volumen no entran: su dato se muestra debajo del precio y del
+ * símbolo, respectivamente. Desde `sm` la tabla es la de siempre.
+ */
 export function CotizacionesTable({
   items,
   mostrarVariacion = true,
@@ -36,20 +41,20 @@ export function CotizacionesTable({
           <tr>
             <th
               scope="col"
-              className="px-2.5 py-1.5 text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
+              className="px-2.5 py-1.5 max-sm:px-2 max-sm:py-1 text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
             >
               Símbolo
             </th>
             <th
               scope="col"
-              className="px-2.5 py-1.5 text-right text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
+              className="px-2.5 py-1.5 max-sm:px-2 max-sm:py-1 text-right text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
             >
               {columnaPrecio}
             </th>
             {mostrarVariacion && (
               <th
                 scope="col"
-                className="px-2.5 py-1.5 text-right text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
+                className="px-2.5 py-1.5 max-sm:hidden text-right text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
               >
                 Variación
               </th>
@@ -57,7 +62,7 @@ export function CotizacionesTable({
             {mostrarVolumen && (
               <th
                 scope="col"
-                className="px-2.5 py-1.5 text-right text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
+                className="px-2.5 py-1.5 max-sm:hidden text-right text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
               >
                 Vol.
               </th>
@@ -67,17 +72,29 @@ export function CotizacionesTable({
         <tbody className="divide-y divide-border/40">
           {items.map((item) => (
             <tr key={item.simbolo} className="transition-colors hover:bg-accent/5">
-              <td className="px-2.5 py-1 font-medium text-foreground">{item.simbolo}</td>
-              <td className="px-2.5 py-1 text-right font-mono tabular-nums text-foreground/90">
+              <td className="px-2.5 py-1 max-sm:px-2 max-sm:py-0.5 font-medium text-foreground">
+                {item.simbolo}
+                {mostrarVolumen && item.volumen ? (
+                  <span className="block font-mono text-[0.65rem] font-normal tabular-nums text-muted-foreground/70 sm:hidden">
+                    Vol. {formatVolumen(item.volumen)}
+                  </span>
+                ) : null}
+              </td>
+              <td className="px-2.5 py-1 max-sm:px-2 max-sm:py-0.5 text-right font-mono tabular-nums text-foreground/90">
                 {item.ultimoPrecio !== null ? formatPrice(item.ultimoPrecio) : "-"}
+                {mostrarVariacion && item.variacionPorcentual !== null ? (
+                  <span className="mt-0.5 block sm:hidden">
+                    <VariacionBadge variacion={item.variacionPorcentual} />
+                  </span>
+                ) : null}
               </td>
               {mostrarVariacion && (
-                <td className="px-2.5 py-1 text-right">
+                <td className="px-2.5 py-1 max-sm:hidden text-right">
                   <VariacionBadge variacion={item.variacionPorcentual} />
                 </td>
               )}
               {mostrarVolumen && (
-                <td className="px-2.5 py-1 text-right font-mono tabular-nums text-muted-foreground">
+                <td className="px-2.5 py-1 max-sm:hidden text-right font-mono tabular-nums text-muted-foreground">
                   {item.volumen ? formatVolumen(item.volumen) : "-"}
                 </td>
               )}

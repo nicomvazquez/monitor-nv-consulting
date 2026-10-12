@@ -14,10 +14,9 @@ export function MacroUsaSection({ indicadores, error, vix, vixError }: MacroUsaS
   const hayContenido = vix !== null || (indicadores !== null && indicadores.length > 0);
 
   return (
-    <section className="flex flex-col gap-2">
+    <section className="flex flex-col gap-1.5 sm:gap-2">
       <header>
-        <h2 className="text-base font-semibold text-foreground">Indicadores macro EE.UU.</h2>
-        <p className="text-xs text-muted-foreground">VIX y variables monetarias.</p>
+        <h2 className="text-base max-sm:text-sm font-semibold text-foreground">Indicadores macro EE.UU.</h2>
       </header>
 
       {hayContenido && (

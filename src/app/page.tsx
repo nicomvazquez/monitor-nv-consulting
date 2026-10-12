@@ -1,5 +1,6 @@
-import { CaucionSection } from "@/components/caucion/CaucionSection";
 import { CryptoLivePanel } from "@/components/cryptos/CryptoLivePanel";
+import { CarruselNoticias } from "@/components/noticias/CarruselNoticias";
+import type { NoticiaListado } from "@/components/noticias/ListadoNoticias";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { PanelSection } from "@/components/cotizaciones/PanelSection";
 import { getRiesgoPais } from "@/lib/argentinadatos/riesgoPais";
@@ -15,6 +16,7 @@ import {
 } from "@/lib/iol/cotizaciones";
 import { isMercadoAbierto } from "@/lib/iol/market-hours";
 import { getIndicadoresMacroUsa } from "@/lib/fred/macro";
+import { getNoticiasSemana } from "@/lib/noticias/googleNews";
 import { getCommodities } from "@/lib/yahoofinance/commodities";
 import { getIndicesAmericanos } from "@/lib/yahoofinance/indices";
 import { getVix } from "@/lib/yahoofinance/vix";
@@ -86,6 +88,32 @@ async function fetchMacroUsa() {
   }
 }
 
+const MAX_DESTACADAS = 10;
+
+async function fetchNoticiasDestacadas() {
+  try {
+    const noticias = await getNoticiasSemana();
+    // Las más cubiertas primero (varios medios publican el mismo hecho); a igual cobertura, las más recientes.
+    const destacadas = [...noticias]
+      .sort((a, b) => b.cobertura - a.cobertura || b.fecha.getTime() - a.fecha.getTime())
+      .slice(0, MAX_DESTACADAS)
+      .map<NoticiaListado>((n) => ({
+        titulo: n.titulo,
+        medio: n.medio,
+        url: n.url,
+        fecha: n.fecha.toISOString(),
+        cobertura: n.cobertura,
+      }));
+    return { noticiasDestacadas: destacadas, noticiasError: null as string | null };
+  } catch (cause) {
+    logError("noticias-destacadas", cause);
+    return {
+      noticiasDestacadas: null,
+      noticiasError: "No se pudieron cargar las noticias destacadas. Probá recargar la página en unos minutos.",
+    };
+  }
+}
+
 async function fetchVix() {
   try {
     return { vix: await getVix(), vixError: null as string | null };
@@ -101,6 +129,7 @@ export default async function HomePage() {
     riesgoPais,
     macroUsa,
     vix,
+    noticias,
     cryptosIniciales,
     caucion,
     panelLider,
@@ -115,6 +144,7 @@ export default async function HomePage() {
     fetchRiesgoPais(),
     fetchMacroUsa(),
     fetchVix(),
+    fetchNoticiasDestacadas(),
     getCryptosIniciales(),
     fetchPanel("caucion", getCaucionesTabla),
     fetchPanel("panel-lider", getPanelLider),
@@ -129,80 +159,89 @@ export default async function HomePage() {
   const columnaPrecio = (await isMercadoAbierto()) ? "Último" : "Cierre";
 
   return (
-    <div className="mx-auto flex w-full max-w-[100rem] flex-1 flex-col gap-6 px-6 py-5 lg:flex-row lg:items-start">
-      {/* Único <h1> de la home: oculto visualmente porque el dashboard no necesita un
-          título grande arriba de todo, pero tiene que existir para accesibilidad/SEO. */}
-      <h1 className="sr-only">Cotizaciones del mercado argentino y global en vivo</h1>
+    <>
+    {(noticias.noticiasDestacadas || noticias.noticiasError) && (
+      <div className="mx-auto w-full max-w-[100rem] px-6 max-sm:px-2 pt-3 sm:pt-5">
+        {noticias.noticiasDestacadas ? (
+          noticias.noticiasDestacadas.length > 0 && <CarruselNoticias noticias={noticias.noticiasDestacadas} />
+        ) : (
+          <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {noticias.noticiasError}
+          </p>
+        )}
+      </div>
+    )}
 
-      <Sidebar
-        {...macro}
-        {...riesgoPais}
-        {...macroUsa}
-        {...vix}
-        caucion={<CaucionSection {...caucion} />}
-      />
+      <div className="mx-auto flex w-full max-w-[100rem] flex-1 flex-col gap-6 max-sm:gap-3 px-6 max-sm:px-2 py-5 max-sm:py-2 lg:flex-row lg:items-start">
+        {/* Único <h1> de la home: oculto visualmente porque el dashboard no necesita un
+            título grande arriba de todo, pero tiene que existir para accesibilidad/SEO. */}
+        <h1 className="sr-only">Cotizaciones del mercado argentino y global en vivo</h1>
 
-      {/* Orden fijo: para cambiarlo, mover estos bloques de lugar. Columnas CSS (no grid): cada
-          panel mide lo que necesita su contenido (ver `max-h` en CotizacionesTable), así que un
-          panel corto no deja hueco al lado de uno largo — el siguiente panel sube a ocupar ese
-          espacio, como en un muro de Pinterest. `break-inside-avoid` evita que un panel se parta
-          entre dos columnas. */}
-      <main className="min-w-0 flex-1 columns-1 gap-5 sm:columns-2 xl:columns-3">
-        <div className="mb-5 break-inside-avoid">
-          <PanelSection title="Panel Líder" columnaPrecio={columnaPrecio} {...panelLider} />
-        </div>
-        <div className="mb-5 break-inside-avoid">
-          <PanelSection
-            title="Bonos soberanos en dólares (MEP)"
-            description="Bonares, Globales, Discount, Par y Bonos del Tesoro."
-            columnaPrecio={columnaPrecio}
-            {...bonosDolares}
-          />
-        </div>
-        <div className="mb-5 break-inside-avoid">
-          <PanelSection
-            title="Letras"
-            description="LECAPs y LECER del Tesoro en pesos."
-            columnaPrecio={columnaPrecio}
-            {...letras}
-          />
-        </div>
-        <div className="mb-5 break-inside-avoid">
-          <PanelSection
-            title="Bonos CER"
-            description="Deuda del Tesoro en pesos ajustada por CER."
-            columnaPrecio={columnaPrecio}
-            {...bonosCer}
-          />
-        </div>
-        <div className="mb-5 break-inside-avoid">
-          <PanelSection
-            title="CEDEARs principales"
-            description="Los más operados del día."
-            columnaPrecio={columnaPrecio}
-            {...cedears}
-          />
-        </div>
-        <div className="mb-5 break-inside-avoid">
-          <PanelSection
-            title="Índices americanos"
-            description="S&P 500, Dow Jones, Nasdaq y Russell 2000."
-            columnaPrecio="Último"
-            {...indices}
-          />
-        </div>
-        <div className="mb-5 break-inside-avoid">
-          <PanelSection
-            title="Commodities"
-            description="Oro, petróleo WTI, soja, maíz y trigo."
-            columnaPrecio="Último"
-            {...commodities}
-          />
-        </div>
-        <div className="mb-5 break-inside-avoid">
-          <CryptoLivePanel inicial={cryptosIniciales} />
-        </div>
-      </main>
-    </div>
+        <Sidebar {...macro} {...riesgoPais} {...macroUsa} {...vix} />
+
+        {/* Orden fijo: para cambiarlo, mover estos bloques de lugar. Columnas CSS (no grid): cada
+            panel mide lo que necesita su contenido (ver `max-h` en CotizacionesTable), así que un
+            panel corto no deja hueco al lado de uno largo — el siguiente panel sube a ocupar ese
+            espacio, como en un muro de Pinterest. `break-inside-avoid` evita que un panel se parta
+            entre dos columnas. */}
+        <main className="min-w-0 flex-1 columns-2 gap-3 sm:gap-5 xl:columns-3">
+          <div className="mb-3 sm:mb-5 break-inside-avoid">
+            <PanelSection title="Panel Líder" columnaPrecio={columnaPrecio} {...panelLider} />
+          </div>
+          <div className="mb-3 sm:mb-5 break-inside-avoid">
+            <PanelSection
+              title="Caución"
+              columnaPrecio="TNA"
+              {...caucion}
+            />
+          </div>
+          <div className="mb-3 sm:mb-5 break-inside-avoid">
+            <PanelSection
+              title="Bonos soberanos en dólares (MEP)"
+              columnaPrecio={columnaPrecio}
+              {...bonosDolares}
+            />
+          </div>
+          <div className="mb-3 sm:mb-5 break-inside-avoid">
+            <PanelSection
+              title="Letras"
+              columnaPrecio={columnaPrecio}
+              {...letras}
+            />
+          </div>
+          <div className="mb-3 sm:mb-5 break-inside-avoid">
+            <PanelSection
+              title="Bonos CER"
+              columnaPrecio={columnaPrecio}
+              {...bonosCer}
+            />
+          </div>
+          <div className="mb-3 sm:mb-5 break-inside-avoid">
+            <PanelSection
+              title="CEDEARs principales"
+              columnaPrecio={columnaPrecio}
+              {...cedears}
+            />
+          </div>
+          <div className="mb-3 sm:mb-5 break-inside-avoid">
+            <PanelSection
+              title="Índices americanos"
+              columnaPrecio="Último"
+              {...indices}
+            />
+          </div>
+          <div className="mb-3 sm:mb-5 break-inside-avoid">
+            <PanelSection
+              title="Commodities"
+              columnaPrecio="Último"
+              {...commodities}
+            />
+          </div>
+          <div className="mb-3 sm:mb-5 break-inside-avoid">
+            <CryptoLivePanel inicial={cryptosIniciales} />
+          </div>
+        </main>
+      </div>
+    </>
   );
 }

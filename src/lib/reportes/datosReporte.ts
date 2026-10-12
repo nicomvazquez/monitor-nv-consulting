@@ -6,6 +6,8 @@ import { getCryptosIniciales } from "@/lib/binance/cryptos";
 import { getDolares } from "@/lib/dolarapi/dolares";
 import type { Dolar } from "@/lib/dolarapi/types";
 import { getIndicadoresMacroUsa } from "@/lib/fred/macro";
+import type { BonoFila } from "@/lib/googlesheets/types";
+import { getBonosSheet } from "@/lib/googlesheets/bonos";
 import { getCaucionesTabla } from "@/lib/iol/caucion";
 import {
   getBonosCer,
@@ -43,6 +45,8 @@ export interface DatosReporte {
   indices: Resultado<FilaCotizacion[]>;
   commodities: Resultado<FilaCotizacion[]>;
   criptos: Resultado<FilaCotizacion[]>;
+  /** Hoja de bonos (ticker, TIR, duration) para las curvas de rendimiento — ver `BonosCurvaChart`. */
+  bonosSheet: Resultado<BonoFila[]>;
 }
 
 async function resolver<T>(panel: string, fetcher: () => Promise<T>): Promise<Resultado<T>> {
@@ -78,6 +82,7 @@ export async function getDatosReporte(): Promise<DatosReporte> {
     indices,
     commodities,
     criptos,
+    bonosSheet,
   ] = await Promise.all([
     getFechaUltimoCierre(),
     resolver("dolares", getDolares),
@@ -94,6 +99,7 @@ export async function getDatosReporte(): Promise<DatosReporte> {
     resolver("indices", () => getIndicesAmericanos("cierre")),
     resolver("commodities", () => getCommodities("cierre")),
     resolver("criptos", getCryptosIniciales),
+    resolver("bonos-sheet", getBonosSheet),
   ]);
 
   return {
@@ -113,5 +119,6 @@ export async function getDatosReporte(): Promise<DatosReporte> {
     indices,
     commodities,
     criptos,
+    bonosSheet,
   };
 }

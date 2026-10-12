@@ -9,12 +9,15 @@ export const YAHOO_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
 /**
- * Tickers de Yahoo Finance para los principales índices americanos.
+ * Tickers de Yahoo Finance para los principales índices americanos (en el
+ * sentido de "del continente": Argentina y Brasil primero, después EE.UU.).
  * Verificado a mano contra la API real: `/v7/finance/quote` (que trae
  * varios símbolos en un solo pedido) ahora exige autenticación, así que se
  * pide cada uno por separado contra `/v8/finance/chart/{ticker}`.
  */
 export const INDICES_AMERICANOS = [
+  { ticker: "^MERV", nombre: "Merval (USD)" },
+  { ticker: "^BVSP", nombre: "Bovespa (USD)" },
   { ticker: "^GSPC", nombre: "S&P 500" },
   { ticker: "^DJI", nombre: "Dow Jones" },
   { ticker: "^IXIC", nombre: "Nasdaq Composite" },
@@ -23,6 +26,9 @@ export const INDICES_AMERICANOS = [
 
 /** Vive en el panel de indicadores macro de EE.UU. (no en "Índices americanos"): es un gauge de riesgo, no un índice bursátil. */
 export const VIX = { ticker: "^VIX", nombre: "VIX" } as const;
+
+/** Para pasar el Bovespa (que cotiza en reales) a dólares — ver `getIndicesAmericanos`. */
+export const USD_BRL = { ticker: "BRL=X", nombre: "USD/BRL" } as const;
 
 /**
  * Futuros de Yahoo Finance (sufijo "=F"). Oro y petróleo como referencia

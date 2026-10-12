@@ -13,6 +13,8 @@ export interface TasaCaucionMoneda {
   /** Plazo del que realmente vino la tasa: null si no hubo ninguno dentro del radio de tolerancia. */
   plazoDias: number | null;
   tasa: number | null;
+  /** Monto contado operado a ese plazo (en la moneda de la fila): hace de volumen en la tabla. */
+  monto: number | null;
 }
 
 export interface FilaCaucion {
@@ -54,7 +56,7 @@ function masCercano(titulos: CaucionTitulo[], plazoSolicitado: number): CaucionT
 
 function tasaParaPlazo(titulos: CaucionTitulo[], plazoSolicitado: number): TasaCaucionMoneda {
   const titulo = masCercano(titulos, plazoSolicitado);
-  return { plazoDias: titulo?.plazo ?? null, tasa: titulo?.tasaPromedio ?? null };
+  return { plazoDias: titulo?.plazo ?? null, tasa: titulo?.tasaPromedio ?? null, monto: titulo?.montoContado ?? null };
 }
 
 /** Una fila por plazo (1, 7, 14 — en ese orden), con la tasa en pesos y en dólares. */
@@ -87,12 +89,13 @@ function filaTabla(prefijo: string, plazoSolicitado: number, valor: TasaCaucionM
       : `Caución a ${etiquetaPlazo}`,
     ultimoPrecio: valor.tasa,
     variacionPorcentual: null,
+    volumen: valor.monto,
   };
 }
 
 /**
  * Las mismas tasas que `getTasasCaucion`, aplanadas a filas de tabla
- * (Símbolo/Último/Variación) para reusar `CotizacionesTable`. Ordenadas por
+ * (Símbolo/Último/Variación/Volumen) para reusar `CotizacionesTable`. La variación no aplica a cauciones (queda "-"). Ordenadas por
  * plazo (1, 7, 14), alternando pesos/dólares dentro de cada plazo.
  */
 export async function getCaucionesTabla(): Promise<FilaCotizacion[]> {

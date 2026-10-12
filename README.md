@@ -2,7 +2,7 @@
 
 App Next.js que consulta la API de [IOL invertirOnline](https://api.invertironline.com) desde el servidor y muestra, en un dashboard blanco y negro con detalles en celeste (ver [Paleta de colores](#paleta-de-colores)), distintos paneles de mercado — todos con la misma tabla (Símbolo / Último / Variación) — dispuestos en grilla para ver la mayor cantidad posible juntas. Header y footer viven en el layout raíz, así que son compartidos por todas las páginas del sitio (hoy: la home y `/calculadora-bonos`).
 
-La home se divide en una barra lateral izquierda (caución + indicadores macro de Argentina y de EE.UU.) y el contenido principal a la derecha (el resto de las tablas), en un orden fijo: Panel Líder, Bonos MEP, Letras, Bonos CER, CEDEARs, Índices americanos, Commodities y Criptomonedas. Para cambiar el orden alcanza con reordenar los bloques en `app/page.tsx` — no hay drag-and-drop ni persistencia en `localStorage` (se probó y se sacó; ver Notas de diseño).
+La home tiene una barra lateral izquierda en escritorio (botón de reporte + indicadores macro de Argentina y de EE.UU., apilados) y el contenido principal a la derecha (las tablas, incluida la caución). En mobile, la barra va arriba con las dos macro lado a lado y las tablas se muestran en dos columnas; en escritorio no cambia. Orden fijo: Panel Líder, Caución, Bonos MEP, Letras, Bonos CER, CEDEARs, Índices americanos, Commodities y Criptomonedas. Para cambiar el orden alcanza con reordenar los bloques en `app/page.tsx` — no hay drag-and-drop ni persistencia en `localStorage` (se probó y se sacó; ver Notas de diseño).
 
 Secciones disponibles en la home:
 
@@ -10,8 +10,8 @@ Secciones disponibles en la home:
 - **Dólares**: carrusel de tarjetas con compra/venta de cada tipo de dólar (oficial, blue, bolsa/MEP, CCL, mayorista, cripto, tarjeta), vía [dolarapi.com](https://dolarapi.com) — no es parte de la API de IOL. Gira solo, sin JS (animación CSS), y se pausa al pasar el mouse.
 - **Indicadores macro** *(barra lateral)*: riesgo país (tarjeta resaltada, vía [ArgentinaDatos](https://api.argentinadatos.com)) más reservas internacionales, inflación mensual e interanual, tasa de política monetaria, tasa BADLAR de bancos privados y base monetaria, vía la [API del BCRA](https://api.bcra.gob.ar), y UVA (también de ArgentinaDatos) — ninguna de las tres es de IOL.
 - **Indicadores macro EE.UU.** *(barra lateral)*: espejo del panel anterior pero para EE.UU. — VIX (tarjeta resaltada, vía Yahoo Finance) más tasa de la Fed, inflación interanual (CPI), desempleo, oferta monetaria (M2), PBI trimestral y el rendimiento del bono del Tesoro a 10 años (la "tasa libre de riesgo" de referencia global), vía [FRED](https://fred.stlouisfed.org) (API del banco central de EE.UU., requiere una API key gratuita).
-- **Caución** *(barra lateral)*: la tasa promedio operada a 1, 7 y 14 días, en pesos y en dólares (una fila por combinación, ordenadas por plazo). Se muestra como lista compacta, con el mismo formato que los indicadores macro (no la tabla con columnas de los demás paneles).
-- **Descargar reporte (PDF)** *(barra lateral, arriba de Caución)*: genera y descarga un PDF de una plantilla fija con todos los paneles de la home (ver [Reporte de cierre en PDF](#reporte-de-cierre-en-pdf)).
+- **Caución**: la tasa promedio operada a 1, 7 y 14 días, en pesos y en dólares. Es un panel más del grid, con la misma tabla, estilos y comportamiento que el resto. La columna de precio dice "TNA", la variación queda en "-" (las cauciones no tienen variación) y el Vol. es el monto contado operado a ese plazo, en la moneda de la fila.
+- **Descargar reporte (PDF)** *(barra lateral, arriba de los indicadores macro)*: genera y descarga un PDF de una plantilla fija con todos los paneles de la home (ver [Reporte de cierre en PDF](#reporte-de-cierre-en-pdf)).
 - **Criptomonedas**: BTC, ETH, BNB, XRP, SOL y ADA en USD, actualizadas en vivo por WebSocket de Binance (no polling) — tampoco es de IOL.
 - **Panel Líder**: acciones argentinas del panel líder (Merval).
 - **CEDEARs principales**: los CEDEARs más operados del día (por `cantidadOperaciones`).
@@ -31,7 +31,7 @@ En `/calculadora-bonos`:
 ```
 src/
   app/
-    page.tsx                     # Home: pide todo, arma la barra lateral (macro + caución) y el grid reordenable
+    page.tsx                     # Home: pide todo, arma la barra lateral (reporte + macro) y el grid reordenable
     layout.tsx                   # Fuentes, paleta de colores, y el Header/Footer compartidos (pide dólares acá)
     globals.css                   # Tokens de color (--color-background/--color-accent/...) y @keyframes marquee
     calculadora-bonos/
@@ -47,7 +47,7 @@ src/
       Footer.tsx                   # Marca + navegación + contacto, créditos de fuentes, disclaimer y copyright
       Logo.tsx                     # `next/image` de public/logo.png, compartido por Header (priority) y Footer
       NavLink.tsx                  # "use client": Link que se resalta en accent cuando la ruta actual coincide
-      Sidebar.tsx                  # Barra lateral izquierda de la home: caución + indicadores macro (misma altura de fila)
+      Sidebar.tsx                  # Barra lateral de la home (arriba, a ancho completo): botón de reporte + indicadores macro
     ui/
       ErrorMessage.tsx             # Marca de error compartida por todas las secciones (evita repetir el mismo div 4 veces)
     bonos/                         # UI de la hoja de bonos de Google Sheets, en /calculadora-bonos
@@ -60,9 +60,6 @@ src/
       PanelSection.tsx           # Tarjeta de dashboard: título + estado de error + tabla de un panel
       CotizacionesTable.tsx      # Tabla Símbolo/Último/Variación/Volumen (recibe FilaCotizacion[])
       VariacionBadge.tsx
-    caucion/                      # UI de la caución, como lista compacta (no la tabla del resto de paneles)
-      CaucionSection.tsx           # Mismo patrón que PanelSection/MacroSection: header + lista, sin tarjeta envolvente
-      CaucionList.tsx               # Filas símbolo+tasa, igual formato visual que MacroCard
     dolares/                     # UI de las tarjetas de dólar (dolarapi.com), usadas dentro del Header
       DolaresCarousel.tsx         # Loop infinito por CSS (@keyframes marquee en globals.css)
       DolarCard.tsx
@@ -72,7 +69,7 @@ src/
       DescargarReporteButton.tsx   # "use client": botón de la barra lateral, pide el PDF y dispara la descarga
       ReporteCierreDocument.tsx    # Plantilla del PDF (primitivas de @react-pdf/renderer, no HTML)
     macro/                        # UI de la lista de indicadores del BCRA + riesgo país
-      MacroSection.tsx              # Mismo patrón que PanelSection/CaucionSection: header + lista de filas divididas
+      MacroSection.tsx              # Mismo patrón que PanelSection/MacroSection: header + lista de filas divididas
       MacroCard.tsx                  # Fila compacta (no tarjeta): label+fecha a la izquierda, valor en mono a la derecha
       RiesgoPaisCard.tsx             # Fila destacada (fondo/borde en el color de acento) que encabeza la lista
     macroUsa/                     # Igual que macro/, pero genérico (FilaIndicador) en vez de atado a BcraVariable
@@ -358,7 +355,7 @@ Para sumar un panel nuevo alcanza con: una función que devuelva
 
 ### Reporte de cierre en PDF
 
-El botón "Descargar reporte (PDF)" de la barra lateral (arriba de Caución)
+El botón "Descargar reporte (PDF)" de la barra lateral (arriba de los indicadores macro)
 pide `GET /api/reporte-cierre`, que arma un PDF de una sola plantilla fija
 (`components/reportes/ReporteCierreDocument.tsx`) con todos los paneles de
 la home, en el mismo orden en que aparecen ahí: dólares, indicadores macro
@@ -515,7 +512,7 @@ Todo el sitio es gris/blanco/negro salvo `--accent`: es el único color no neutr
 
 - El logo (`public/logo.png`, 500x300, fondo transparente) se usa vía `next/image` en `Logo.tsx` — `public/` es el lugar correcto para assets estáticos en Next.js, se sirven directo desde la raíz (`/logo.png`). `favicon`/`apple-icon` (`src/app/icon.png` y `apple-icon.png`, generados con `sharp` recortando el margen transparente del original) usan fondo sólido negro en vez de transparente: la "V" gris clara del logo casi desaparece sobre blanco (el fondo de tab por defecto), pero se ve nítida sobre el mismo negro del sitio.
 - El año del copyright en `Footer.tsx` es una constante fija (`AÑO = 2026`), no `new Date().getFullYear()`. El footer se renderiza en el layout raíz, o sea en todas las páginas: calcularlo en cada request forzaría a Next a tratar toda la app como dinámica, perdiendo el prerenderizado estático que hoy tiene `/calculadora-bonos`. Hay que actualizarlo a mano una vez por año.
-- Ningún panel/sección va envuelto en una tarjeta (borde+fondo+sombra): es un diseño deliberadamente plano — título y contenido flotan directo sobre el fondo de la página, y el único borde visible es el propio de cada tabla/lista (necesario para delimitar su scroll interno). `PanelSection`, `MacroSection`, `CaucionSection` y `CryptoLivePanel` comparten esa misma estructura simple (`header` + contenido, sin envoltorio).
+- Ningún panel/sección va envuelto en una tarjeta (borde+fondo+sombra): es un diseño deliberadamente plano — título y contenido flotan directo sobre el fondo de la página, y el único borde visible es el propio de cada tabla/lista (necesario para delimitar su scroll interno). `PanelSection`, `MacroSection` y `CryptoLivePanel` comparten esa misma estructura simple (`header` + contenido, sin envoltorio).
 - El texto secundario muy chico (fechas, descripciones) usa un único tamaño (`text-[0.7rem]`) en toda la app, en vez de mezclar 0.6rem/0.65rem/0.7rem sin motivo real.
 - `CotizacionesTable` usa alto **máximo** (no fijo, `max-h-[28rem]`): un panel con pocas filas (Índices, Commodities) mide lo que necesita su contenido, no los mismos 28rem que uno con 25 filas (Bonos CER) — más allá del máximo, scrollea.
 - El contenido principal de la home usa **columnas CSS** (`columns-1 sm:columns-2 xl:columns-3` en `app/page.tsx`, cada panel envuelto en un `<div className="mb-5 break-inside-avoid">`), no un grid. La diferencia importa justo por el punto anterior: en un grid, todos los paneles de una misma fila comparten alto (el más alto define el alto de la fila, dejando hueco debajo de los cortos); con columnas CSS cada panel mide lo que necesita y el siguiente panel de esa columna sube a ocupar el espacio libre, como un muro de Pinterest — sin eso, el alto variable de `max-h` no serviría de mucho. `break-inside-avoid` evita que un panel se parta entre dos columnas. Antes había un reordenamiento interactivo (botones ↑/↓, orden guardado en `localStorage`, columnas calculadas a mano con `ResizeObserver`) que se sacó por pedido explícito: era una fuente de bugs (parpadeo en el primer render, desincronización al redimensionar) para lograr algo que las columnas CSS nativas ya resuelven solas.
@@ -530,13 +527,13 @@ Todo el sitio es gris/blanco/negro salvo `--accent`: es el único color no neutr
   - Las filas de `CotizacionesTable` bajaron su padding (`py-2` → `py-1`) para que entren más símbolos sin scroll.
   - El layout principal pasó de grid a columnas CSS con `max-h` en vez de alto fijo (ver las dos notas de arriba) — esto es lo que realmente ahorra espacio en blanco, no la densidad de cada fila.
   - El Header se achicó (logo+título en una sola línea, sin la bajada "Mercado argentino en vivo"; la tarjeta de cada dólar en el carrusel pasó de dos columnas con labels "Compra"/"Venta" a un solo renglón `$compra / $venta` — la posición ya identifica cuál es cuál, y el `title="Compra / Venta"` del `<dl>` más los `<dt className="sr-only">` conservan el significado para lectores de pantalla).
-  - Se recortaron las descripciones de panel que solo repetían el título sin sumar información (Panel Líder, Criptomonedas) o que tenían palabras de más (Bonos MEP, Letras, Bonos CER, CEDEARs, indicadores macro); `description` en `PanelSection` ahora es opcional. En `CaucionList`, la descripción por fila ("Caución a 1 día") se dejó de mostrar porque repetía lo que ya decía el símbolo ("Pesos 1D") — se sigue mostrando solo en el caso de fallback real ("más cercana operada: X días"), que sí aporta información.
+  - Se recortaron las descripciones de panel que solo repetían el título sin sumar información (Panel Líder, Criptomonedas) o que tenían palabras de más (Bonos MEP, Letras, Bonos CER, CEDEARs, indicadores macro); `description` en `PanelSection` ahora es opcional. En la caución (antes `CaucionList`), la descripción por fila ("Caución a 1 día") se dejó de mostrar porque repetía lo que ya decía el símbolo ("Pesos 1D") — se sigue mostrando solo en el caso de fallback real ("más cercana operada: X días"), que sí aporta información.
   - Un espacio irrompible (U+00A0) entre el número y la unidad en los valores de `MacroCard`/`lib/fred/macro.ts` (ej. "...46.262.060,00 M") evita que la unidad quede colgando sola en su propia línea si el texto llega a quebrar — quedó de la prueba con tiles, pero es una mejora válida igual en la lista.
 - **Columna Volumen**: `FilaCotizacion.volumen` es opcional (no todas las fuentes lo tienen) y se muestra abreviado (`formatVolumen` en `lib/format.ts`, ej. "48,3M") porque el número crudo tiene demasiados dígitos para una columna angosta. De dónde sale según la fuente:
   - IOL: ya viene en `CotizacionPanelItem.volumen` — se pedía y se descartaba al armar la fila, no es un pedido nuevo.
   - Yahoo Finance: `meta.regularMarketVolume`, mismo pedido que ya se hacía para precio/variación.
   - Binance: `quoteVolume` (volumen en USDT, no en unidades de la moneda — más comparable entre BTC/ETH/etc. que mezclar "cantidad de BTC" con "cantidad de ETH"), tanto en la foto inicial (`GET /ticker/24hr`) como en vivo (`q` del stream `@ticker`).
-  - Caución no participa: no usa `CotizacionesTable`, usa `CaucionList` con su propio formato de lista.
+  - Caución usa `CotizacionesTable` como el resto: Variación queda en "-" y Vol. es el `montoContado` de IOL.
 - **Feriados en `isMercadoAbierto()`/`getFechaUltimoCierre()`**: durante un buen tiempo estas dos
   funciones (`lib/iol/market-hours.ts`) solo miraban fin de semana — un feriado hábil (ej. 25/12,
   que siempre cae entre semana) hacía que el sitio pensara que el mercado estaba operando. Se
@@ -559,3 +556,59 @@ Todo el sitio es gris/blanco/negro salvo `--accent`: es el único color no neutr
     real, viernes, dentro del horario de rueda — `isMercadoAbierto()` da `false` (antes hubiera
     dado `true`), y `getFechaUltimoCierre()` del lunes siguiente salta correctamente feriado +
     fin de semana y cae en el jueves anterior.
+
+### Página de noticias (`/noticias`)
+
+Lista de noticias de mercados, economía y cripto de los últimos 7 días, tomadas de
+Google Noticias (RSS gratuito, sin clave) — `lib/noticias/googleNews.ts`.
+
+- **Ventana de 7 días**: la consulta lleva `when:7d` y, además, el filtro se aplica en
+  código contra la fecha de publicación; nada más viejo se muestra.
+- **Relevancia**: se consultan 11 búsquedas (8 de mercados argentinos, Wall Street, Fed,
+  commodities; 3 de cripto). Se descartan titulares que no hablan del tema (`ES_FINANCIERO`
+  para mercados, `ES_CRIPTO` para cripto), se deduplican y se cuenta cuántos medios cubren
+  cada hecho (`calcularCobertura`, mismo heurístico que el informe). El badge "N medios" en
+  la página es ese número.
+- **Pocas y de calidad**: se muestran como máximo 24 de mercados y 8 de cripto, ordenadas
+  primero por cobertura (hechos que varios medios publican) y después por fecha. Los cupos
+  están en `MAX_MERCADOS` y `MAX_CRIPTO`.
+- **Caché**: 30 minutos (`next.revalidate`), igual que los demás datos del sitio.
+- El parser y el filtro (`parsearRss`, `ES_FINANCIERO`, `calcularCobertura`) viven en
+  `lib/reportes/noticias.ts` y se reusan desde acá; el pipeline del informe no cambió.
+- **Carrusel en la home**: arriba de los paneles, un carrusel automático (mismo patrón que el
+  de dólares) recorre las 10 noticias con mayor cobertura de la semana
+  (`components/noticias/CarruselNoticias.tsx`). Se pausa al pasar el mouse o al enfocar con
+  teclado, y no se anima si el usuario tiene reducción de movimiento activada. Usa los mismos
+  datos cacheados que `/noticias`, sin pedidos extra.
+- Google Noticias aparece como fuente en el footer.
+
+### Filtros en la página de noticias
+
+El listado de `/noticias` (`components/noticias/ListadoNoticias.tsx`, client component) filtra
+en el navegador sobre las noticias ya traídas del servidor, sin nuevos pedidos:
+
+- **Búsqueda por texto** en título y medio, sin distinguir mayúsculas ni acentos, con etiqueta
+  visible y botón para borrar.
+- **Medio**: lista de los medios presentes en la semana.
+- **Tema**: chips con conteo. Los temas se asignan por palabras clave en el título
+  (`lib/noticias/temas.ts`, en orden de prioridad); un titular sin tema igual se muestra, solo
+  queda fuera de los filtros por tema.
+- **Solo hechos muy cubiertos** (5 o más medios, según el badge de cobertura).
+- Accesibilidad: chips como botones con `aria-pressed`, conteo en vivo (`aria-live`), estado
+  vacío con salida clara, targets de 44px en mobile.
+
+Pendiente conocido: el ancho de la página en mobile supera el viewport por el header/barra de
+dólares (ya pasaba antes en el home), lo que corta el borde derecho del contenido.
+
+## Diseño mobile
+
+Todo el ajuste para teléfono va con variantes `max-sm:` (menos de 640px), así que el desktop y la tablet no cambian por construcción:
+
+- **Paddings y gaps** de la página y del footer se achican (`px-3` en lugar de `px-6`).
+- **Tablas** (`CotizacionesTable`): de a dos columnas en mobile. Variación se muestra debajo del precio y Volumen debajo del símbolo; las columnas quedan ocultas en `max-sm`.
+- **Indicadores macro**: la etiqueta va arriba y el valor abajo; las dos macro van lado a lado debajo del botón de reporte.
+- **Bonos**: la tabla de nueve columnas mantiene el scroll horizontal, con el ticker fijo a la izquierda.
+- **Noticias**: las cards pasan a fila (bloque con inicial a la izquierda) y el carrusel destacado usa cards más angostas.
+- **Header**: el link "Calculadora de bonos" se muestra como "Bonos" en mobile.
+
+Verificado midiendo con Edge headless y el protocolo de depuración a 390, 800 y 1440px: sin desborde horizontal en home, noticias y calculadora.

@@ -19,13 +19,15 @@ const TEMAS = [
 
 // Las búsquedas de Google Noticias traen ruido (deportes, espectáculos) que comparte alguna palabra con el tema:
 // solo pasan los titulares que hablan de mercados, economía o política económica.
-const ES_FINANCIERO =
+export const ES_FINANCIERO =
   /riesgo pa[ií]s|bono|acci[oó]n|acciones|merval|d[oó]lar|bolsa|wall street|mercado|tasa|bcra|banco central|inflaci[oó]n|reservas|caputo|s&p|nasdaq|dow jones|petr[oó]leo|cedear|econom|fmi|deuda|plazo fijo|cauci[oó]n|d[eé]ficit|super[aá]vit|fiscal|inversor|cotiza|cripto|bitcoin|oro\b|soja|trigo|fed\b|treasury|rendimiento|peso\b|devaluaci[oó]n|brecha/i;
 
 export interface Titular {
   titulo: string;
   medio: string;
   fecha: Date;
+  /** Enlace a la nota (redirección de Google Noticias). Solo lo completa el parser; el informe no lo usa. */
+  url?: string;
   /** Cuántos titulares del día cuentan el mismo hecho (incluido este): más cobertura = hecho más relevante. */
   cobertura: number;
 }
@@ -39,19 +41,20 @@ function decodificar(texto: string): string {
     .trim();
 }
 
-function parsearRss(xml: string): Titular[] {
+export function parsearRss(xml: string): Titular[] {
   const titulares: Titular[] = [];
 
   for (const [, item] of xml.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
     const bruto = decodificar(item.match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? "");
     const fecha = new Date(item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] ?? "");
     if (!bruto || Number.isNaN(fecha.getTime())) continue;
+    const url = decodificar(item.match(/<link>([\s\S]*?)<\/link>/)?.[1] ?? "");
 
     // Google Noticias agrega el medio al final del título: "Titular - Medio".
     const corte = bruto.lastIndexOf(" - ");
     const titulo = corte > 0 ? bruto.slice(0, corte) : bruto;
     const medio = corte > 0 ? bruto.slice(corte + 3) : "";
-    titulares.push({ titulo, medio, fecha, cobertura: 1 });
+    titulares.push({ titulo, medio, fecha, url, cobertura: 1 });
   }
 
   return titulares;
@@ -112,7 +115,7 @@ function mismoHecho(a: Set<string>, b: Set<string>): boolean {
   return comunes >= 3 && comunes / Math.min(a.size, b.size) >= 0.45;
 }
 
-function calcularCobertura(titulares: Titular[]): void {
+export function calcularCobertura(titulares: Titular[]): void {
   const claves = titulares.map((t) => palabrasClave(t.titulo));
   titulares.forEach((titular, i) => {
     titular.cobertura = claves.reduce((n, otra, j) => n + (i === j || mismoHecho(claves[i], otra) ? 1 : 0), 0);

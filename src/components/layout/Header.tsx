@@ -4,26 +4,29 @@ import { DolaresCarousel } from "@/components/dolares/DolaresCarousel";
 import { Logo } from "./Logo";
 import { NavLink } from "./NavLink";
 
-const ENLACES_NAV = [{ href: "/calculadora-bonos", label: "Calculadora de bonos" }];
+const ENLACES_NAV = [
+  { href: "/noticias", label: "Noticias" },
+  { href: "/calculadora-bonos", label: "Calculadora de bonos", corta: "Bonos" },
+];
 
 export function Header({ dolares, error }: { dolares: Dolar[] | null; error: string | null }) {
   return (
-    <header className="sticky top-0 z-10 border-b border-accent/15 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="mx-auto flex w-full max-w-[100rem] flex-col gap-1.5 px-6 py-2">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+    <header className="sticky top-0 z-50 border-b border-accent/15 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <div className="mx-auto flex w-full max-w-[100rem] flex-col gap-2.5 px-6 max-sm:px-2 py-3 max-sm:py-2">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
-            <Logo priority className="h-6 w-auto" />
+            <Logo priority className="h-7 w-auto" />
             {/* No es <h1>: esto vive en el layout raíz, se repite en todas las páginas — el
                 título de cada página es el que define esa página, no el nombre del sitio. */}
-            <p className="text-sm font-semibold tracking-tight text-foreground">
+            <p className="text-base font-semibold tracking-tight text-foreground">
               Cotizaciones<span className="text-accent">.</span>
             </p>
           </Link>
 
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-5 max-sm:gap-4">
             {ENLACES_NAV.map((enlace) => (
               <NavLink key={enlace.href} href={enlace.href}>
-                {enlace.label}
+                {enlace.corta ? (<><span className="max-sm:hidden">{enlace.label}</span><span className="sm:hidden">{enlace.corta}</span></>) : enlace.label}
               </NavLink>
             ))}
           </nav>

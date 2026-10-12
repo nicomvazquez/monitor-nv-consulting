@@ -45,6 +45,7 @@ function aFila(item: CotizacionPanelItem, modo: ModoPrecio, mercadoAbierto: bool
     ultimoPrecio: mostrarCierre ? item.ultimoCierre : item.ultimoPrecio,
     variacionPorcentual: variacionValida ? item.variacionPorcentual : null,
     volumen: item.volumen,
+    cantidadOperaciones: item.cantidadOperaciones,
   };
 }
 

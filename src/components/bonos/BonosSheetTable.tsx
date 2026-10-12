@@ -37,8 +37,8 @@ export function BonosSheetTable({ filas }: { filas: BonoFila[] }) {
                 key={titulo}
                 scope="col"
                 className={
-                  "px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-wide text-accent " +
-                  (i === 0 ? "" : "text-right")
+                  "px-2 py-1 sm:px-3 sm:py-2 text-[0.7rem] font-semibold uppercase tracking-wide text-accent " +
+                  (i === 0 ? "max-sm:sticky max-sm:left-0 max-sm:z-10 max-sm:bg-card" : "text-right")
                 }
               >
                 {titulo}
@@ -55,36 +55,36 @@ export function BonosSheetTable({ filas }: { filas: BonoFila[] }) {
                   <tr className="bg-card">
                     <td
                       colSpan={COLUMNAS.length}
-                      className="px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
+                      className="px-2 py-1.5 sm:px-3 text-[0.7rem] font-semibold uppercase tracking-wide text-accent"
                     >
                       {capitalizar(fila.seccion)}
                     </td>
                   </tr>
                 )}
                 <tr className="transition-colors hover:bg-accent/5">
-                  <td className="px-3 py-2 font-medium text-foreground">{fila.ticker}</td>
-                  <td className="px-3 py-2 text-right font-mono tabular-nums text-foreground/90">
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 max-sm:sticky max-sm:left-0 max-sm:bg-background font-medium text-foreground">{fila.ticker}</td>
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
                     {celda(fila.precioUsd)}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono tabular-nums text-foreground/90">
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
                     {celda(fila.tir, "%")}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono tabular-nums text-foreground/90">
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
                     {fila.proximoPago || "-"}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono tabular-nums text-foreground/90">
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
                     {fila.diasAlProximoPago ?? "-"}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono tabular-nums text-foreground/90">
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
                     {celda(fila.valorPago)}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono tabular-nums text-foreground/90">
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
                     {celda(fila.duration)}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono tabular-nums text-foreground/90">
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
                     {celda(fila.durationModificada)}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono tabular-nums text-foreground/90">
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
                     {celda(fila.convexidad)}
                   </td>
                 </tr>

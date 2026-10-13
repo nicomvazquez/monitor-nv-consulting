@@ -189,10 +189,13 @@ export default async function HomePage() {
             <PanelSection title="Panel Líder" columnaPrecio={columnaPrecio} {...panelLider} />
           </div>
           <div className="mb-3 sm:mb-5 break-inside-avoid">
+            <CryptoLivePanel inicial={cryptosIniciales} />
+          </div>
+          <div className="mb-3 sm:mb-5 break-inside-avoid">
             <PanelSection
-              title="Caución"
-              columnaPrecio="TNA"
-              {...caucion}
+              title="Letras"
+              columnaPrecio={columnaPrecio}
+              {...letras}
             />
           </div>
           <div className="mb-3 sm:mb-5 break-inside-avoid">
@@ -204,9 +207,9 @@ export default async function HomePage() {
           </div>
           <div className="mb-3 sm:mb-5 break-inside-avoid">
             <PanelSection
-              title="Letras"
-              columnaPrecio={columnaPrecio}
-              {...letras}
+              title="Caución"
+              columnaPrecio="TNA"
+              {...caucion}
             />
           </div>
           <div className="mb-3 sm:mb-5 break-inside-avoid">
@@ -236,9 +239,6 @@ export default async function HomePage() {
               columnaPrecio="Último"
               {...commodities}
             />
-          </div>
-          <div className="mb-3 sm:mb-5 break-inside-avoid">
-            <CryptoLivePanel inicial={cryptosIniciales} />
           </div>
         </main>
       </div>

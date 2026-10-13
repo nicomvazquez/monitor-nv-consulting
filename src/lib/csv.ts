@@ -1,4 +1,17 @@
 /**
+ * Formato numérico argentino tal como lo exportan las hojas de cálculo del
+ * usuario (coma decimal, "%" al final opcional, "$" y espacios alrededor
+ * opcionales): "7,34%" -> 7.34, " $134,08" -> 134.08, "" -> null.
+ */
+export function parseNumeroAr(valor: string | undefined): number | null {
+  if (!valor) return null;
+  const limpio = valor.trim().replace(/^\$\s*/, "").replace(/%$/, "").replace(",", ".");
+  if (limpio === "") return null;
+  const numero = Number(limpio);
+  return Number.isNaN(numero) ? null : numero;
+}
+
+/**
  * Parser mínimo de CSV: separa por comas respetando campos entre comillas
  * dobles (con `""` como comilla escapada dentro de un campo) y saltos de
  * línea `\n`/`\r\n`. Suficiente para lo que expone Google Sheets vía

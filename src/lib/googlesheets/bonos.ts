@@ -1,17 +1,8 @@
-import { parseCsv } from "@/lib/csv";
+import { parseCsv, parseNumeroAr } from "@/lib/csv";
 import { BONOS_SHEET_CSV_URL, REVALIDATE_SECONDS_BONOS_SHEET } from "./config";
 import type { BonoFila } from "./types";
 
 const CLAVE_HEADER = "ticker";
-
-/** Formato numérico argentino (coma decimal): "7,34%" -> 7.34, "54,4" -> 54.4, "" -> null. */
-function parseNumeroAr(valor: string | undefined): number | null {
-  if (!valor) return null;
-  const limpio = valor.trim().replace(/%$/, "").replace(",", ".");
-  if (limpio === "") return null;
-  const numero = Number(limpio);
-  return Number.isNaN(numero) ? null : numero;
-}
 
 /**
  * La hoja no es una tabla única: son bloques separados por filas en blanco,

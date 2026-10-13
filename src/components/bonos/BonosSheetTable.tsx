@@ -66,7 +66,7 @@ export function BonosSheetTable({ filas }: { filas: BonoFila[] }) {
                   <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
                     {celda(fila.precioUsd)}
                   </td>
-                  <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono font-semibold tabular-nums text-accent">
                     {celda(fila.tir, "%")}
                   </td>
                   <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
@@ -75,7 +75,7 @@ export function BonosSheetTable({ filas }: { filas: BonoFila[] }) {
                   <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
                     {fila.diasAlProximoPago ?? "-"}
                   </td>
-                  <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono font-semibold tabular-nums text-accent">
                     {celda(fila.valorPago)}
                   </td>
                   <td className="px-2 py-1 sm:px-3 sm:py-2 text-right font-mono tabular-nums text-foreground/90">

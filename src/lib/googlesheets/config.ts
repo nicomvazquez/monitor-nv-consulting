@@ -11,3 +11,8 @@ export const BONOS_SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${BON
 
 /** Es una hoja que el usuario edita a mano de tanto en tanto, no cotizaciones en vivo: alcanza con revisar cada 30 minutos. */
 export const REVALIDATE_SECONDS_BONOS_SHEET = 30 * 60;
+
+/** Misma lógica que `BONOS_SHEET_ID`, pero para la hoja de LECAPs (letras capitalizables en pesos) del usuario. */
+export const LECAPS_SHEET_ID = "1fUOVgemeY4AtpKDFp2G5iwxwdtG3fuUqpoFfRsfpPUI";
+
+export const LECAPS_SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${LECAPS_SHEET_ID}/export?format=csv`;

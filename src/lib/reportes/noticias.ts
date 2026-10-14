@@ -1,20 +1,25 @@
 const TIMEOUT_MS = 8_000;
-const POR_TEMA = 8;
-const MAX_TITULARES = 40;
+const POR_TEMA = 15;
+const MAX_TITULARES = 50;
 const ZONA = "America/Argentina/Buenos_Aires";
 
-/** Temas que mueven la rueda; cada uno es una búsqueda en Google Noticias (RSS gratuito, sin clave). */
+/**
+ * Temas que mueven la rueda, agrupados en categorías amplias (no una búsqueda
+ * puntual por activo) para que cada una traiga variedad en vez de competir
+ * entre sí por resultados casi iguales.
+ */
 const TEMAS = [
-  "Merval acciones argentinas",
-  "riesgo país bonos argentinos",
-  "dólar hoy Argentina",
-  "BCRA tasas inflación",
-  "reservas Banco Central compra de dólares",
-  "Caputo Milei anuncio economía",
-  "FMI deuda vencimientos bonos",
-  "Wall Street S&P 500 Nasdaq",
-  "Fed tasas de interés Estados Unidos",
-  "petróleo oro commodities precio",
+  // Política
+  "política argentina gobierno Milei Caputo",
+  "elecciones Argentina congreso reformas",
+  // Cripto
+  "criptomonedas bitcoin mercado cripto",
+  // Marco local
+  "mercado financiero Argentina dólar riesgo país Merval",
+  "BCRA reservas inflación tasas deuda Argentina",
+  // Contexto internacional
+  "Wall Street Fed Estados Unidos mercados",
+  "Brasil China economía global commodities petróleo",
 ];
 
 // Las búsquedas de Google Noticias traen ruido (deportes, espectáculos) que comparte alguna palabra con el tema:
@@ -122,9 +127,15 @@ export function calcularCobertura(titulares: Titular[]): void {
   });
 }
 
-export async function getTitulares(fechaCierre: Date): Promise<Titular[]> {
+/**
+ * `temasExtra` se suma a los temas fijos para esta corrida (ej. la acción
+ * que más se movió hoy, ver `temasDinamicos` en `resumenIA.ts`) — se
+ * deduplica porque un mismo nombre puede repetirse entre paneles.
+ */
+export async function getTitulares(fechaCierre: Date, temasExtra: string[] = []): Promise<Titular[]> {
   const dia = fechaCierre.toISOString().slice(0, 10);
-  const resultados = await Promise.allSettled(TEMAS.map((tema) => titularesDeTema(tema, dia)));
+  const temas = [...new Set([...TEMAS, ...temasExtra])];
+  const resultados = await Promise.allSettled(temas.map((tema) => titularesDeTema(tema, dia)));
 
   const vistos = new Set<string>();
   const titulares: Titular[] = [];

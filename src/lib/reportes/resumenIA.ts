@@ -35,6 +35,30 @@ function lineas(filas: FilaCotizacion[] | null, max: number): string {
 
 const formateadorDiaMes = new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "2-digit", timeZone: "America/Argentina/Buenos_Aires" });
 
+/** % de variación a partir del cual una acción/CEDEAR es noticia por sí sola, no solo movimiento de rutina. */
+const UMBRAL_MOVIMIENTO_RELEVANTE = 3;
+
+function mayorMovimiento(filas: FilaCotizacion[] | null): FilaCotizacion | null {
+  if (!filas) return null;
+  return filas.reduce<FilaCotizacion | null>((mayor, fila) => {
+    if (fila.variacionPorcentual === null) return mayor;
+    if (!mayor || Math.abs(fila.variacionPorcentual) > Math.abs(mayor.variacionPorcentual ?? 0)) return fila;
+    return mayor;
+  }, null);
+}
+
+/**
+ * Además de los temas fijos de `getTitulares`, busca puntualmente la acción
+ * del Panel Líder y el CEDEAR que más se movieron hoy — ata la "investigación"
+ * a lo que de verdad pasó en la rueda, no solo a temas genéricos. Se ignoran
+ * movimientos chicos (ruido de todos los días, no amerita una búsqueda aparte).
+ */
+function temasDinamicos(datos: DatosReporte): string[] {
+  return [mayorMovimiento(datos.panelLider.datos), mayorMovimiento(datos.cedears.datos)]
+    .filter((f): f is FilaCotizacion => f !== null && Math.abs(f.variacionPorcentual ?? 0) >= UMBRAL_MOVIMIENTO_RELEVANTE)
+    .map((f) => `${f.descripcion} noticias`);
+}
+
 function lineaTitular(t: Titular): string {
   const cobertura = t.cobertura > 1 ? ` [cubierto por ${t.cobertura} medios]` : "";
   return `${formateadorDiaMes.format(t.fecha)} — ${t.titulo}${t.medio ? ` (${t.medio})` : ""}${cobertura}`;
@@ -166,7 +190,7 @@ ${armarDatos(datos, titulares)}`,
 export async function getResumenIA(datos: DatosReporte): Promise<ResumenIA | null> {
   if (!process.env.GEMINI_API_KEY) return null;
 
-  const titulares = await getTitulares(datos.fechaCierre);
+  const titulares = await getTitulares(datos.fechaCierre, temasDinamicos(datos));
 
   for (const { modelo, timeoutMs } of MODELOS) {
     try {

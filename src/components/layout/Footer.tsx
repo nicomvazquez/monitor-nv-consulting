@@ -19,16 +19,29 @@ const FUENTES = [
   { nombre: "Google Noticias", href: "https://news.google.com" },
 ];
 
+/**
+ * A mano, no generado del git log: solo lo que le importa a quien usa el
+ * sitio (una funcionalidad nueva), no cada commit técnico. Agregar lo nuevo
+ * arriba de todo y, si la lista pasa de 5, sacar la más vieja.
+ */
+const NOVEDADES = [
+  { fecha: "13/10", texto: "El resumen del día lo escribe una IA, investigando noticias de política, cripto, mercado local y contexto internacional" },
+  { fecha: "13/10", texto: "El reporte diario también se puede descargar en PNG, además de PDF" },
+  { fecha: "13/10", texto: "Calculadora de LECAPs: tabla, curva de rendimientos y carry trade contra el dólar" },
+  { fecha: "12/10", texto: "Reporte diario de cierre de mercado, descargable en PDF" },
+  { fecha: "08/09", texto: "Calculadora de bonos soberanos, con curva de rendimientos" },
+];
+
 export function Footer() {
   return (
     <footer className="border-t border-accent/15 bg-background/95">
       <div className="mx-auto flex w-full max-w-[100rem] flex-col gap-8 max-sm:gap-4 px-6 max-sm:px-2 py-10 max-sm:py-4">
-        <div className="grid grid-cols-1 gap-4 sm:gap-8 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-[1fr_1fr_1fr_1.6fr]">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <Logo className="h-5 w-auto" />
               <span className="text-sm font-semibold text-foreground">
-                Cotizaciones<span className="text-accent">.</span>
+                Monitor<span className="text-accent">.</span>
               </span>
             </div>
             <p className="mt-2 text-sm font-medium text-foreground">Nicolás Vázquez</p>
@@ -38,6 +51,9 @@ export function Footer() {
             <h2 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Navegación</h2>
             <Link href="/" className="text-sm text-muted-foreground transition-colors hover:text-accent">
               Inicio
+            </Link>
+            <Link href="/noticias" className="text-sm text-muted-foreground transition-colors hover:text-accent">
+              Noticias
             </Link>
             <Link
               href="/calculadora-bonos"
@@ -63,6 +79,18 @@ export function Footer() {
             >
               LinkedIn
             </a>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <h2 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Novedades</h2>
+            <ul className="flex flex-col gap-1.5">
+              {NOVEDADES.map((novedad) => (
+                <li key={novedad.texto} className="flex gap-2 text-sm text-muted-foreground">
+                  <span className="shrink-0 font-mono text-xs text-accent/80 tabular-nums">{novedad.fecha}</span>
+                  <span>{novedad.texto}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 

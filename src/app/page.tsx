@@ -175,7 +175,7 @@ export default async function HomePage() {
       <div className="mx-auto flex w-full max-w-[100rem] flex-1 flex-col gap-6 max-sm:gap-3 px-6 max-sm:px-2 py-5 max-sm:py-2 lg:flex-row lg:items-start">
         {/* Único <h1> de la home: oculto visualmente porque el dashboard no necesita un
             título grande arriba de todo, pero tiene que existir para accesibilidad/SEO. */}
-        <h1 className="sr-only">Cotizaciones del mercado argentino y global en vivo</h1>
+        <h1 className="sr-only">Monitor del mercado argentino y global en vivo</h1>
 
         <Sidebar {...macro} {...riesgoPais} {...macroUsa} {...vix} />
 
@@ -200,7 +200,7 @@ export default async function HomePage() {
           </div>
           <div className="mb-3 sm:mb-5 break-inside-avoid">
             <PanelSection
-              title="Bonos soberanos en dólares (MEP)"
+              title="Bonos soberanos en dólares"
               columnaPrecio={columnaPrecio}
               {...bonosDolares}
             />
@@ -228,7 +228,7 @@ export default async function HomePage() {
           </div>
           <div className="mb-3 sm:mb-5 break-inside-avoid">
             <PanelSection
-              title="Índices americanos"
+              title="Índices"
               columnaPrecio="Último"
               {...indices}
             />

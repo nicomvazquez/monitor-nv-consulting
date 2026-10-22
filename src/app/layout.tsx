@@ -22,12 +22,12 @@ const DESCRIPCION =
 
 export const metadata: Metadata = {
   title: {
-    default: "Cotizaciones — Mercado argentino y global en vivo",
-    template: "%s — Cotizaciones",
+    default: "Monitor — Mercado argentino y global en vivo",
+    template: "%s — Monitor",
   },
   description: DESCRIPCION,
   openGraph: {
-    title: "Cotizaciones — Mercado argentino y global en vivo",
+    title: "Monitor — Mercado argentino y global en vivo",
     description: DESCRIPCION,
     locale: "es_AR",
     type: "website",

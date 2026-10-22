@@ -19,7 +19,7 @@ export function Header({ dolares, error }: { dolares: Dolar[] | null; error: str
             {/* No es <h1>: esto vive en el layout raíz, se repite en todas las páginas — el
                 título de cada página es el que define esa página, no el nombre del sitio. */}
             <p className="text-base font-semibold tracking-tight text-foreground">
-              Cotizaciones<span className="text-accent">.</span>
+              Monitor<span className="text-accent">.</span>
             </p>
           </Link>
 

@@ -10,7 +10,7 @@ export function Logo({ className = "h-7 w-auto", priority = false }: { className
   return (
     <Image
       src="/logo.png"
-      alt="Cotizaciones"
+      alt="Monitor"
       width={500}
       height={300}
       priority={priority}

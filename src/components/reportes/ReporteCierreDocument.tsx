@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   footerTexto: { fontSize: 6.5, color: MUTED, maxWidth: 420 },
-  seccion: { marginTop: 7 },
+  seccion: { marginTop: 4 },
   tituloFila: { flexDirection: "row", alignItems: "center", gap: 4 },
   tituloBarra: { width: 3, height: 8, borderRadius: 1, backgroundColor: ACCENT },
   seccionTitulo: {
@@ -103,11 +103,11 @@ const styles = StyleSheet.create({
   },
   seccionSubtitulo: { fontSize: 7, color: MUTED, marginTop: 1, marginBottom: 3 },
   tabla: { borderWidth: 0.75, borderColor: BORDER, borderRadius: 3, overflow: "hidden" },
-  filaEncabezado: { flexDirection: "row", paddingVertical: 3.5, paddingHorizontal: 8, backgroundColor: CARD },
+  filaEncabezado: { flexDirection: "row", paddingVertical: 3, paddingHorizontal: 8, backgroundColor: CARD },
   fila: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 3.25,
+    paddingVertical: 2.75,
     paddingHorizontal: 8,
     fontSize: 7.5,
     borderTopWidth: 0.5,
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     borderLeftColor: ACCENT,
     backgroundColor: CARD,
-    paddingVertical: 7,
+    paddingVertical: 5.5,
     paddingHorizontal: 9,
     lineHeight: 1.32,
   },
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderTopColor: ACCENT,
     backgroundColor: CARD,
-    paddingVertical: 5,
+    paddingVertical: 3.5,
     paddingHorizontal: 6,
   },
   tarjetaDolarNombre: { fontSize: 6, color: MUTED, textTransform: "uppercase", letterSpacing: 0.3 },
@@ -158,37 +158,16 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderTopColor: ACCENT,
     backgroundColor: CARD,
-    paddingVertical: 6,
+    paddingVertical: 4,
     paddingHorizontal: 7,
   },
   tarjetaIndiceNombre: { fontSize: 7, color: MUTED, fontFamily: "Helvetica-Bold" },
   tarjetaIndiceValor: { fontSize: 9.5, fontFamily: "Helvetica-Bold", color: TEXT, marginTop: 2 },
   tarjetaIndiceVariacion: { alignSelf: "flex-start", fontSize: 7, marginTop: 3 },
   curvaColumna: { flex: 1, minWidth: 0 },
-  curvaCaja: { borderWidth: 0.75, borderColor: BORDER, borderRadius: 3, backgroundColor: CARD, padding: 6 },
-  curvaTitulo: { fontSize: 8, fontFamily: "Helvetica-Bold", color: ACCENT, marginBottom: 3 },
-  curvaStats: { fontSize: 6.25, color: MUTED, marginTop: 3 },
-  bonoTabla: { marginTop: 5, borderWidth: 0.75, borderColor: BORDER, borderRadius: 3, overflow: "hidden" },
-  bonoFilaEncabezado: {
-    flexDirection: "row",
-    paddingVertical: 2.5,
-    paddingHorizontal: 7,
-    backgroundColor: BG,
-  },
-  bonoEncabezadoTexto: { fontSize: 5.5, fontFamily: "Helvetica-Bold", color: ACCENT, textTransform: "uppercase" },
-  bonoFila: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 2.25,
-    paddingHorizontal: 7,
-    borderTopWidth: 0.5,
-    borderTopColor: BORDER,
-  },
-  bonoTickerFila: { flexDirection: "row", alignItems: "center", gap: 3 },
-  bonoPunto: { width: 4, height: 4, borderRadius: 2 },
-  bonoCeldaTicker: { fontSize: 6.25, fontFamily: "Helvetica-Bold" },
-  bonoCelda: { fontSize: 6, textAlign: "right", color: MUTED },
-  bonoCeldaTir: { fontSize: 6, textAlign: "right", fontFamily: "Helvetica-Bold", color: TEXT },
+  curvaCaja: { borderWidth: 0.75, borderColor: BORDER, borderRadius: 3, backgroundColor: CARD, padding: 4.5 },
+  curvaTitulo: { fontSize: 8.5, fontFamily: "Helvetica-Bold", color: ACCENT, marginBottom: 4 },
+  curvaStats: { fontSize: 6.75, color: MUTED, marginTop: 5 },
 });
 
 const formateadorFechaHora = new Intl.DateTimeFormat("es-AR", {
@@ -238,7 +217,7 @@ function Encabezado({
         <Image src={LOGO} style={styles.logo} />
         <View>
           <Text style={styles.marca}>
-            Cotizaciones<Text style={styles.marcaPunto}>.</Text>
+            Monitor<Text style={styles.marcaPunto}>.</Text>
           </Text>
           <Text style={styles.subMarca}>Cierre del {formatFechaCierre(fechaCierre)}</Text>
         </View>
@@ -276,7 +255,7 @@ function Pie() {
 /** Título de sección con una pequeña barra de acento: todas las secciones comparten el mismo color (ver `ACCENT`). */
 function TituloSeccion({ titulo, subtitulo }: { titulo: string; subtitulo?: string }) {
   return (
-    <View style={{ marginBottom: subtitulo ? 3 : 5 }}>
+    <View style={{ marginBottom: subtitulo ? 3 : 4 }}>
       <View style={styles.tituloFila}>
         <View style={styles.tituloBarra} />
         <Text style={styles.seccionTitulo}>{titulo}</Text>
@@ -286,11 +265,17 @@ function TituloSeccion({ titulo, subtitulo }: { titulo: string; subtitulo?: stri
   );
 }
 
-/** Más párrafos o más caracteres de los habituales (el texto lo redacta un modelo, su largo varía) → letra algo más chica para que siga entrando en una sola página. */
+/**
+ * El resumen apunta a 200-240 palabras (~1300-1600 caracteres): con eso entra
+ * con letra grande, aprovechando el espacio que deja el resto de la página.
+ * Los umbrales de más arriba son solo un resguardo por si el modelo se
+ * extiende de más, para que igual entre en una sola página.
+ */
 function tamañoAdaptativo(longitud: number): { fontSize: number; lineHeight: number } {
-  if (longitud > 2200) return { fontSize: 7.5, lineHeight: 1.3 };
-  if (longitud > 1800) return { fontSize: 8, lineHeight: 1.32 };
-  return { fontSize: 8.5, lineHeight: 1.35 };
+  if (longitud > 2200) return { fontSize: 8, lineHeight: 1.3 };
+  if (longitud > 1700) return { fontSize: 8.75, lineHeight: 1.32 };
+  if (longitud > 1200) return { fontSize: 9.75, lineHeight: 1.35 };
+  return { fontSize: 10.5, lineHeight: 1.4 };
 }
 
 function ResumenDia({ resumen }: { resumen: ResumenIA }) {
@@ -390,7 +375,8 @@ function TarjetasDolares({ resultado }: { resultado: Resultado<Dolar[]> }) {
   );
 }
 
-function TarjetasIndices({ resultado }: { resultado: Resultado<FilaCotizacion[]> }) {
+/** Cards compactas de símbolo/valor/variación, una fila a lo ancho de la página — hoy solo las usa Índices. */
+function TarjetasCotizacion({ resultado }: { resultado: Resultado<FilaCotizacion[]> }) {
   const { datos, error } = resultado;
 
   if (!datos || datos.length === 0) return <SinDatos error={error} />;
@@ -414,11 +400,11 @@ function TarjetasIndices({ resultado }: { resultado: Resultado<FilaCotizacion[]>
 }
 
 const CURVA_ANCHO = 250;
-const CURVA_ALTO = 84;
-const CURVA_PAD_IZQ = 24;
-const CURVA_PAD_DER = 6;
-const CURVA_PAD_ARRIBA = 8;
-const CURVA_PAD_ABAJO = 15;
+const CURVA_ALTO = 94;
+const CURVA_PAD_IZQ = 27;
+const CURVA_PAD_DER = 8;
+const CURVA_PAD_ARRIBA = 12;
+const CURVA_PAD_ABAJO = 20;
 const CURVA_GRIDLINES = 3;
 const CURVA_MUESTRAS = 24;
 
@@ -439,9 +425,8 @@ function escalar(valor: number, min: number, max: number, destinoMin: number, de
  * `BonosCurvaChart` del sitio: la curva y "barato" van en el color de texto
  * principal (más visibles), "caro" en el muted — el verde/rojo del reporte
  * se reserva para variaciones de precio reales, no para esta señal de
- * valuación relativa. Debajo va una tabla con el detalle de cada bono
- * (precio, TIR y duration exactos): el gráfico da una lectura visual, la
- * tabla complementa con los números concretos.
+ * valuación relativa. Sin tabla de detalle debajo (a propósito): el reporte
+ * queda solo con la lectura visual, cada punto ya lleva su ticker.
  */
 function CurvaBonosPdf({ filas, seccion, titulo }: { filas: BonoFila[]; seccion: string; titulo: string }) {
   const bonos = filas
@@ -513,18 +498,18 @@ function CurvaBonosPdf({ filas, seccion, titulo }: { filas: BonoFila[]; seccion:
                 stroke={BORDER}
                 strokeWidth={0.75}
               />
-              <Text x={CURVA_PAD_IZQ - 4} y={y + 2} textAnchor="end" style={{ fontSize: 5.5, fill: MUTED }}>
+              <Text x={CURVA_PAD_IZQ - 5} y={y + 2.5} textAnchor="end" style={{ fontSize: 6.5, fill: MUTED }}>
                 {valor.toFixed(1)}%
               </Text>
             </G>
           ))}
 
-          <Path d={curvaPath} fill="none" stroke={ACCENT} strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
+          <Path d={curvaPath} fill="none" stroke={ACCENT} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
 
           {coords.map((c) => (
             <G key={c.ticker}>
-              <Circle cx={c.cx} cy={c.cy} r={3} fill={c.barato ? TEXT : MUTED} stroke={BG} strokeWidth={1} />
-              <Text x={c.cx} y={c.cy - 6} textAnchor="middle" style={{ fontSize: 5.5, fill: TEXT, fontFamily: "Helvetica-Bold" }}>
+              <Circle cx={c.cx} cy={c.cy} r={3.8} fill={c.barato ? TEXT : MUTED} stroke={BG} strokeWidth={1.3} />
+              <Text x={c.cx} y={c.cy - 8} textAnchor="middle" style={{ fontSize: 6.5, fill: TEXT, fontFamily: "Helvetica-Bold" }}>
                 {c.ticker}
               </Text>
             </G>
@@ -534,48 +519,21 @@ function CurvaBonosPdf({ filas, seccion, titulo }: { filas: BonoFila[]; seccion:
           R² {formatPrice(bondadAjuste * 100)}% · TIR prom. {formatPrice(tirPromedio)}% · {baratos} baratos / {caros} caros
         </Text>
       </View>
-
-      <View style={styles.bonoTabla}>
-        <View style={styles.bonoFilaEncabezado}>
-          <Text style={[styles.bonoEncabezadoTexto, { width: "26%" }]}>Ticker</Text>
-          <Text style={[styles.bonoEncabezadoTexto, styles.celdaDerecha, { width: "26%" }]}>Precio</Text>
-          <Text style={[styles.bonoEncabezadoTexto, styles.celdaDerecha, { width: "24%" }]}>TIR</Text>
-          <Text style={[styles.bonoEncabezadoTexto, styles.celdaDerecha, { width: "24%" }]}>Dur.</Text>
-        </View>
-        {bonos.map((bono, i) => {
-          const barato = (bono.tir as number) > evaluarCurva(coeficientes, bono.duration as number);
-          return (
-            <View
-              key={bono.ticker}
-              style={[styles.bonoFila, i % 2 === 1 ? { backgroundColor: ZEBRA } : undefined]}
-              wrap={false}
-            >
-              <View style={[styles.bonoTickerFila, { width: "26%" }]}>
-                <View style={[styles.bonoPunto, { backgroundColor: barato ? TEXT : MUTED }]} />
-                <Text style={styles.bonoCeldaTicker}>{bono.ticker}</Text>
-              </View>
-              <Text style={[styles.bonoCelda, { width: "26%" }]}>
-                {bono.precioUsd !== null ? formatPrice(bono.precioUsd) : "-"}
-              </Text>
-              <Text style={[styles.bonoCeldaTir, { width: "24%" }]}>{formatPrice(bono.tir as number)}%</Text>
-              <Text style={[styles.bonoCelda, { width: "24%" }]}>{formatPrice(bono.duration as number)}</Text>
-            </View>
-          );
-        })}
-      </View>
     </View>
   );
 }
 
 /**
  * Reporte de cierre en una sola página: dólares (tarjetas) → resumen del día
- * con IA (noticias + rueda) → índices (tarjetas) → top 5 movimientos de
- * Panel Líder y CEDEARs → curvas de rendimiento de bonos. Riesgo país va en
- * el encabezado, no acá (ver `Encabezado`). El resto de los paneles de la
- * home (caución, letras, commodities, etc.) no entran en este formato
- * compacto. Misma paleta e identidad visual que el sitio (fondo negro,
- * acento celeste, verde/rojo solo para variaciones de precio) en vez de un
- * esquema propio "para papel".
+ * con IA (noticias + rueda) → índices (tarjetas) → top 5 movimientos de Panel
+ * Líder y CEDEARs (tablas) → curvas de rendimiento de bonos (sin tabla de
+ * detalle, ver `CurvaBonosPdf`) → criptomonedas y commodities (tablas, mismo
+ * formato que Panel Líder/CEDEARs). Riesgo país va en el encabezado, no acá
+ * (ver `Encabezado`). El resto de los paneles de la home (caución, letras,
+ * bonos CER, etc.) no entran en este formato compacto.
+ * Misma paleta e identidad visual que el sitio (fondo negro, acento celeste,
+ * verde/rojo solo para variaciones de precio) en vez de un esquema propio
+ * "para papel".
  */
 export function ReporteCierreDocument({ datos, resumen }: { datos: DatosReporte; resumen: ResumenIA | null }) {
   const bonosSheet = datos.bonosSheet.datos ?? [];
@@ -583,7 +541,7 @@ export function ReporteCierreDocument({ datos, resumen }: { datos: DatosReporte;
   return (
     <Document
       title={`Reporte de cierre - ${datos.generadoEn.toLocaleDateString("es-AR")}`}
-      author="Cotizaciones"
+      author="Monitor"
     >
       <Page size="A4" style={styles.page}>
         <Encabezado
@@ -602,7 +560,7 @@ export function ReporteCierreDocument({ datos, resumen }: { datos: DatosReporte;
 
         <View style={styles.seccion}>
           <TituloSeccion titulo="Índices" />
-          <TarjetasIndices resultado={datos.indices} />
+          <TarjetasCotizacion resultado={datos.indices} />
         </View>
 
         <View style={styles.seccion}>
@@ -624,8 +582,21 @@ export function ReporteCierreDocument({ datos, resumen }: { datos: DatosReporte;
 
         <View style={styles.seccion}>
           <View style={styles.grid2}>
-            <CurvaBonosPdf filas={bonosSheet} seccion="ley local" titulo="Curva de rendimientos — Ley local" />
-            <CurvaBonosPdf filas={bonosSheet} seccion="ley new york" titulo="Curva de rendimientos — Ley extranjera" />
+            <CurvaBonosPdf filas={bonosSheet} seccion="ley local" titulo="Curva de bonos — Ley local" />
+            <CurvaBonosPdf filas={bonosSheet} seccion="ley new york" titulo="Curva de bonos — Ley extranjera" />
+          </View>
+        </View>
+
+        <View style={styles.seccion}>
+          <View style={styles.grid2}>
+            <View style={styles.grid2Col}>
+              <TituloSeccion titulo="Criptomonedas" />
+              <TablaCotizaciones resultado={datos.criptos} />
+            </View>
+            <View style={styles.grid2Col}>
+              <TituloSeccion titulo="Commodities" />
+              <TablaCotizaciones resultado={datos.commodities} />
+            </View>
           </View>
         </View>
       </Page>

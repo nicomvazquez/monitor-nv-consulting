@@ -7,7 +7,7 @@ const formateadorFecha = new Intl.DateTimeFormat("es-AR", {
   timeZone: "America/Argentina/Buenos_Aires",
 });
 
-function formatValor({ unidadExpresion, moneda, ultValorInformado }: BcraVariable): string {
+export function formatValor({ unidadExpresion, moneda, ultValorInformado }: BcraVariable): string {
   if (unidadExpresion.toLowerCase().includes("porcentaje")) {
     return `${formatPrice(ultValorInformado)}%`;
   }

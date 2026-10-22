@@ -1,6 +1,8 @@
+import { formatValor } from "@/components/macro/MacroCard";
+import type { BcraVariable } from "@/lib/bcra/types";
+import type { FilaCotizacion, FilaIndicador } from "@/lib/types";
 import type { DatosReporte } from "./datosReporte";
 import { getTitulares, type Titular } from "./noticias";
-import type { FilaCotizacion } from "@/lib/types";
 
 const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/interactions";
 // Primero el modelo que "piensa" (redacta un análisis bastante mejor, pero tarda 10-25 s); si falla o se pasa del
@@ -30,6 +32,22 @@ function lineas(filas: FilaCotizacion[] | null, max: number): string {
       const variacion = f.variacionPorcentual !== null ? ` (${f.variacionPorcentual}%)` : "";
       return `${f.simbolo}: ${precio}${variacion}`;
     })
+    .join("; ");
+}
+
+function lineasIndicador(filas: FilaIndicador[] | null, max: number): string {
+  if (!filas) return "sin datos";
+  return filas
+    .slice(0, max)
+    .map((f) => `${f.nombre}: ${f.valor}`)
+    .join("; ");
+}
+
+function lineasBcra(filas: BcraVariable[] | null, max: number): string {
+  if (!filas) return "sin datos";
+  return filas
+    .slice(0, max)
+    .map((f) => `${f.descripcion.replace(/\.$/, "")}: ${formatValor(f)}`)
     .join("; ");
 }
 
@@ -78,6 +96,11 @@ function armarDatos(datos: DatosReporte, titulares: Titular[]): string {
     `Índices (Merval, Bovespa y EE.UU.): ${lineas(datos.indices.datos, 6)}`,
     `Commodities: ${lineas(datos.commodities.datos, 5)}`,
     `Cripto: ${lineas(datos.criptos.datos, 6)}`,
+    `Caución (tasas, cierre): ${lineas(datos.caucion.datos, 6)}`,
+    `Letras (cierre): ${lineas(datos.letras.datos, 10)}`,
+    `Bonos CER (cierre): ${lineas(datos.bonosCer.datos, 8)}`,
+    `Indicadores macro Argentina (BCRA): ${lineasBcra(datos.macroAr.datos, 12)}`,
+    `Indicadores macro EE.UU.: ${lineasIndicador(datos.macroUsa.datos, 6)}`,
     "",
     `TITULARES DE PRENSA PUBLICADOS EL ${datos.fechaCierre.toISOString().slice(0, 10)} (dd/mm — titular (medio)):`,
     titulares.length > 0 ? titulares.map(lineaTitular).join("\n") : "(no hay titulares de ese día disponibles)",
@@ -85,26 +108,28 @@ function armarDatos(datos: DatosReporte, titulares: Titular[]): string {
 }
 
 const SISTEMA =
-  "Sos un analista de mercados argentino y redactás el informe de cierre de la rueda para inversores. Español " +
-  "rioplatense, tono profesional, claro y directo, sin markdown, sin listas con símbolos, sin tablas. Tenés dos " +
-  "fuentes: los DATOS de cierre y los TITULARES DE PRENSA publicados el día del cierre. Los titulares vienen " +
-  "ordenados por relevancia: los marcados como [cubierto por N medios] son los hechos que dominaron la jornada. " +
-  "Tu trabajo es EXPLICAR qué pasó y por qué, no solo describir los números: identificá los eventos más relevantes " +
-  "del día, decí qué ocurrió, por qué le importa al mercado y cómo se reflejó en los precios de los datos (qué " +
-  "activos se movieron y cuánto). " +
-  "Reglas: usá SOLO los titulares del día provistos: no agregues hechos, cifras ni noticias de días anteriores ni " +
-  "de tu conocimiento previo; nunca inventes cifras; si un titular contradice a los datos, prevalecen los datos; " +
-  "no atribuyas causalidad más fuerte que la que sugieren los titulares (usá 'en un contexto de', 'en línea con', " +
-  "'presionado por'); no cites medios ni copies titulares textualmente; si no hay titulares relevantes, limitate " +
-  "a los datos. " +
-  "Formato exacto, cuatro párrafos separados por una línea en blanco: " +
-  "(1) Panorama: cómo cerró la rueda, con cifras concretas de acciones, bonos, riesgo país y dólar (3 a 4 oraciones). " +
-  "(2) Empezá con 'Eventos relevantes:' y desarrollá los 3 o 4 hechos más importantes del día, cada uno con qué " +
-  "pasó, por qué importa y su efecto en el mercado (5 a 7 oraciones en total). " +
-  "(3) Empezá con 'Contexto internacional:' y explicá qué pasó afuera (Wall Street, tasas, petróleo, etc.) y cómo " +
-  "impactó localmente (2 a 3 oraciones). " +
-  "(4) Empezá con 'Conclusión:' y diga qué dejó la rueda y qué conviene monitorear en la próxima (2 a 3 oraciones). " +
-  "Máximo 330 palabras en total.";
+  "Sos un analista de mercados argentino y redactás un resumen de cierre de rueda para gente que lo lee rápido, " +
+  "muchas veces desde el celular. Español rioplatense, directo, sin jerga innecesaria, sin markdown, sin listas, " +
+  "sin tablas, sin subtítulos de sección. Tenés dos fuentes: los DATOS de cierre (números de acciones, bonos, " +
+  "letras, caución, dólar, macro) y los TITULARES DE PRENSA publicados el día del cierre. Los titulares vienen " +
+  "ordenados por relevancia: los marcados [cubierto por N medios] son los hechos que dominaron la jornada. " +
+  "Antes de escribir, pensá en silencio: de todos los datos y titulares, ¿cuáles son los 3 o 4 hechos que de " +
+  "verdad explican el resultado de la rueda? Cruzá cada titular candidato con los datos — un hecho solo entra en " +
+  "el resumen si se nota en los precios, no alcanza con que haya salido en la prensa. Descartá todo lo que sea " +
+  "ruido, relleno o movimiento de rutina. " +
+  "Reglas: usá SOLO los titulares del día provistos, nunca inventes cifras ni hechos ni uses conocimiento previo " +
+  "tuyo; si un titular contradice a los datos, prevalecen los datos; no atribuyas causalidad más fuerte que la " +
+  "que sugieren los titulares (usá 'en un contexto de', 'en línea con', 'presionado por'); no cites medios ni " +
+  "copies titulares textualmente; si no hay titulares relevantes, limitate a los datos. " +
+  "Escribí exactamente tres párrafos cortos, separados por una línea en blanco, en prosa simple y directa, sin " +
+  "introducción ni cierre de relleno: " +
+  "(1) Panorama: cómo cerró la rueda — dólar, acciones, bonos y riesgo país, con las cifras más relevantes y qué " +
+  "sectores o activos se destacaron (3 a 4 oraciones). " +
+  "(2) Los 2 o 3 hechos que explican el día (los que elegiste al pensar antes de escribir): desarrollá cada uno — " +
+  "qué pasó, por qué pasó y cómo se notó en los precios (5 a 7 oraciones en total). " +
+  "(3) Cierre con lo que tenga más sentido según el día: contexto internacional si influyó en la rueda local, o " +
+  "qué conviene mirar en los próximos días (2 a 3 oraciones). " +
+  "Entre 200 y 240 palabras en total — desarrollá bien cada idea, pero sin relleno ni frases vacías.";
 
 function limpiar(texto: string): string {
   // Marcas de cita que dejan los modelos al buscar: 【2†L6-L10】 o [1], [2, 3].

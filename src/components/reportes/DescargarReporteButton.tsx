@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 type Formato = "pdf" | "png";
@@ -18,7 +19,7 @@ const ICONO_DESCARGA = (
  * muestra "Generando..." mientras espera la respuesta. El PNG parte del
  * mismo PDF (ver `obtenerReportePng`), no es un documento aparte.
  */
-export function DescargarReporteButton() {
+export function DescargarReporteButton({ estaLogueado }: { estaLogueado: boolean }) {
   const [generando, setGenerando] = useState<Formato | null>(null);
   const [error, setError] = useState(false);
 
@@ -44,6 +45,20 @@ export function DescargarReporteButton() {
     } finally {
       setGenerando(null);
     }
+  }
+
+  if (!estaLogueado) {
+    return (
+      <div className="flex flex-col gap-1.5 rounded-lg border border-border px-3 py-2.5">
+        <p className="text-[0.7rem] font-medium uppercase tracking-wide text-muted-foreground">Descargar reporte</p>
+        <p className="text-xs text-muted-foreground">
+          <Link href="/login" className="font-medium text-accent hover:underline">
+            Iniciá sesión
+          </Link>{" "}
+          para descargar el reporte diario.
+        </p>
+      </div>
+    );
   }
 
   return (

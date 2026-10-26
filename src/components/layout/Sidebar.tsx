@@ -14,6 +14,7 @@ interface SidebarProps {
   errorUsa: string | null;
   vix: FilaIndicador | null;
   vixError: string | null;
+  estaLogueado: boolean;
 }
 
 export function Sidebar({
@@ -21,11 +22,12 @@ export function Sidebar({
   errorUsa,
   vix,
   vixError,
+  estaLogueado,
   ...macro
 }: SidebarProps) {
   return (
     <aside className="flex w-full flex-col gap-4 lg:w-72 lg:flex-none">
-      <DescargarReporteButton />
+      <DescargarReporteButton estaLogueado={estaLogueado} />
       {/* En mobile, los dos bloques macro van lado a lado; desde sm, apilados como siempre. */}
       <div className="flex flex-col gap-4 max-sm:grid max-sm:grid-cols-2 max-sm:gap-3">
         <MacroSection {...macro} />

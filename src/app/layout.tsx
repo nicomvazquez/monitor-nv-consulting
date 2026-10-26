@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { auth } from "@/auth";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { getDolares } from "@/lib/dolarapi/dolares";
@@ -47,7 +48,7 @@ async function fetchDolares() {
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const dolares = await fetchDolares();
+  const [dolares, sesion] = await Promise.all([fetchDolares(), auth()]);
 
   return (
     <html
@@ -55,7 +56,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Header dolares={dolares.dolares} error={dolares.error} />
+        <Header dolares={dolares.dolares} error={dolares.error} sesion={sesion} />
         {children}
         <Footer />
       </body>

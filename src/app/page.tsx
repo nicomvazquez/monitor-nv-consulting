@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { CryptoLivePanel } from "@/components/cryptos/CryptoLivePanel";
 import { CarruselNoticias } from "@/components/noticias/CarruselNoticias";
 import type { NoticiaListado } from "@/components/noticias/ListadoNoticias";
@@ -139,6 +140,7 @@ export default async function HomePage() {
     bonosCer,
     indices,
     commodities,
+    sesion,
   ] = await Promise.all([
     fetchMacro(),
     fetchRiesgoPais(),
@@ -154,6 +156,7 @@ export default async function HomePage() {
     fetchPanel("bonos-cer", getBonosCer),
     fetchYahoo("indices-americanos", getIndicesAmericanos),
     fetchYahoo("commodities", getCommodities),
+    auth(),
   ]);
 
   const columnaPrecio = (await isMercadoAbierto()) ? "Último" : "Cierre";
@@ -177,7 +180,7 @@ export default async function HomePage() {
             título grande arriba de todo, pero tiene que existir para accesibilidad/SEO. */}
         <h1 className="sr-only">Monitor del mercado argentino y global en vivo</h1>
 
-        <Sidebar {...macro} {...riesgoPais} {...macroUsa} {...vix} />
+        <Sidebar {...macro} {...riesgoPais} {...macroUsa} {...vix} estaLogueado={Boolean(sesion)} />
 
         {/* Orden fijo: para cambiarlo, mover estos bloques de lugar. Columnas CSS (no grid): cada
             panel mide lo que necesita su contenido (ver `max-h` en CotizacionesTable), así que un

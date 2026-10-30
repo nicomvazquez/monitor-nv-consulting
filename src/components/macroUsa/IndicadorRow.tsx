@@ -1,13 +1,16 @@
 import type { FilaIndicador } from "@/lib/types";
 
-/** Fila compacta (no tarjeta): mismo formato que `MacroCard`, pero genérica (recibe el valor ya formateado). */
-export function IndicadorRow({ indicador }: { indicador: FilaIndicador }) {
+/** Fila de una sola línea: mismo formato que `MacroCard`. */
+export function IndicadorRow({ indicador, zebra = false }: { indicador: FilaIndicador; zebra?: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-3 px-2.5 py-1.5 max-sm:flex-col max-sm:items-start max-sm:gap-0 max-sm:px-2 max-sm:py-1">
-      <div className="min-w-0">
-        <p className="truncate max-sm:line-clamp-2 max-sm:whitespace-normal text-xs text-muted-foreground">{indicador.nombre}</p>
-        {indicador.fecha && <p className="text-[0.7rem] text-muted-foreground/60">Al {indicador.fecha}</p>}
-      </div>
+    <div
+      title={indicador.nombre}
+      className={"flex items-center justify-between gap-3 px-2.5 py-2.5 transition-colors hover:bg-accent/10 " + (zebra ? "bg-white/[0.025]" : "")}
+    >
+      <p className="min-w-0 truncate text-xs text-muted-foreground">
+        {indicador.nombre}
+        {indicador.fecha && <span className="text-muted-foreground/50"> · {indicador.fecha}</span>}
+      </p>
       <p className="flex-none font-mono text-sm font-semibold tabular-nums text-foreground">{indicador.valor}</p>
     </div>
   );

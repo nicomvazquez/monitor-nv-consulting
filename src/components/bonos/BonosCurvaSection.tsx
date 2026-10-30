@@ -1,5 +1,6 @@
 import type { BonoFila } from "@/lib/googlesheets/types";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { ModuloSeccion } from "@/components/ui/Modulo";
 import { BonosCurvaChart } from "./BonosCurvaChart";
 
 interface BonosCurvaSectionProps {
@@ -12,12 +13,8 @@ interface BonosCurvaSectionProps {
 
 export function BonosCurvaSection({ filas, error, seccion, titulo }: BonosCurvaSectionProps) {
   return (
-    <section className="flex flex-col gap-2 sm:gap-3">
-      <header>
-        <h2 className="text-base font-semibold text-foreground">{titulo}</h2>
-      </header>
-
+    <ModuloSeccion titulo={titulo}>
       {error ? <ErrorMessage>{error}</ErrorMessage> : <BonosCurvaChart filas={filas ?? []} seccion={seccion} />}
-    </section>
+    </ModuloSeccion>
   );
 }

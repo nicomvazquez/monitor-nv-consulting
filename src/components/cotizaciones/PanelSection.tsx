@@ -13,29 +13,32 @@ interface PanelSectionProps {
 }
 
 export function PanelSection({
-  title,
+  title,
   items,
   error,
   mostrarVariacion,
   mostrarVolumen = true,
   columnaPrecio,
 }: PanelSectionProps) {
-  return (
-    <section className="flex flex-col gap-1.5 sm:gap-2">
-      <header>
-        <h2 className="text-base max-sm:text-sm font-semibold text-foreground">{title}</h2>
-      </header>
-
-      {error ? (
+  if (error) {
+    return (
+      <section className="flex flex-col gap-2">
+        <header className="flex items-center gap-2">
+          <span aria-hidden="true" className="h-4 w-1 flex-none rounded-full bg-accent/70" />
+          <h2 className="text-base max-sm:text-sm font-semibold text-foreground">{title}</h2>
+        </header>
         <ErrorMessage>{error}</ErrorMessage>
-      ) : (
-        <CotizacionesTable
-          items={items ?? []}
-          mostrarVariacion={mostrarVariacion}
-          mostrarVolumen={mostrarVolumen}
-          columnaPrecio={columnaPrecio}
-        />
-      )}
-    </section>
+      </section>
+    );
+  }
+
+  return (
+    <CotizacionesTable
+      titulo={title}
+      items={items ?? []}
+      mostrarVariacion={mostrarVariacion}
+      mostrarVolumen={mostrarVolumen}
+      columnaPrecio={columnaPrecio}
+    />
   );
 }

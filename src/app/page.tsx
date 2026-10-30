@@ -164,18 +164,18 @@ export default async function HomePage() {
   return (
     <>
     {(noticias.noticiasDestacadas || noticias.noticiasError) && (
-      <div className="mx-auto w-full max-w-[100rem] px-6 max-sm:px-2 pt-3 sm:pt-5">
+      <div className="mx-auto w-full max-w-[100rem] px-6 max-sm:px-1 pt-3 sm:pt-5">
         {noticias.noticiasDestacadas ? (
           noticias.noticiasDestacadas.length > 0 && <CarruselNoticias noticias={noticias.noticiasDestacadas} />
         ) : (
-          <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300 max-sm:px-2.5 max-sm:py-2">
             {noticias.noticiasError}
           </p>
         )}
       </div>
     )}
 
-      <div className="mx-auto flex w-full max-w-[100rem] flex-1 flex-col gap-6 max-sm:gap-3 px-6 max-sm:px-2 py-5 max-sm:py-2 lg:flex-row lg:items-start">
+      <div className="mx-auto flex w-full max-w-[100rem] flex-1 flex-col gap-6 max-sm:gap-2 px-6 max-sm:px-1 py-5 max-sm:py-1.5 lg:flex-row lg:items-start">
         {/* Único <h1> de la home: oculto visualmente porque el dashboard no necesita un
             título grande arriba de todo, pero tiene que existir para accesibilidad/SEO. */}
         <h1 className="sr-only">Monitor del mercado argentino y global en vivo</h1>
@@ -187,61 +187,33 @@ export default async function HomePage() {
             panel corto no deja hueco al lado de uno largo — el siguiente panel sube a ocupar ese
             espacio, como en un muro de Pinterest. `break-inside-avoid` evita que un panel se parta
             entre dos columnas. */}
-        <main className="min-w-0 flex-1 columns-2 gap-3 sm:gap-5 xl:columns-3">
-          <div className="mb-3 sm:mb-5 break-inside-avoid">
+        <main className="min-w-0 flex-1 columns-2 gap-4 max-sm:gap-2 sm:gap-5 xl:columns-3">
+          <div className="mb-4 max-sm:mb-2 sm:mb-5 break-inside-avoid">
             <PanelSection title="Panel Líder" columnaPrecio={columnaPrecio} {...panelLider} />
           </div>
-          <div className="mb-3 sm:mb-5 break-inside-avoid">
+          <div className="mb-4 max-sm:mb-2 sm:mb-5 break-inside-avoid">
             <CryptoLivePanel inicial={cryptosIniciales} />
           </div>
-          <div className="mb-3 sm:mb-5 break-inside-avoid">
-            <PanelSection
-              title="Letras"
-              columnaPrecio={columnaPrecio}
-              {...letras}
-            />
+          <div className="mb-4 max-sm:mb-2 sm:mb-5 break-inside-avoid">
+            <PanelSection title="Letras" columnaPrecio={columnaPrecio} {...letras} />
           </div>
-          <div className="mb-3 sm:mb-5 break-inside-avoid">
-            <PanelSection
-              title="Bonos soberanos en dólares"
-              columnaPrecio={columnaPrecio}
-              {...bonosDolares}
-            />
+          <div className="mb-4 max-sm:mb-2 sm:mb-5 break-inside-avoid">
+            <PanelSection title="Bonos soberanos en dólares" columnaPrecio={columnaPrecio} {...bonosDolares} />
           </div>
-          <div className="mb-3 sm:mb-5 break-inside-avoid">
-            <PanelSection
-              title="Caución"
-              columnaPrecio="TNA"
-              {...caucion}
-            />
+          <div className="mb-4 max-sm:mb-2 sm:mb-5 break-inside-avoid">
+            <PanelSection title="Caución" columnaPrecio="TNA" {...caucion} />
           </div>
-          <div className="mb-3 sm:mb-5 break-inside-avoid">
-            <PanelSection
-              title="Bonos CER"
-              columnaPrecio={columnaPrecio}
-              {...bonosCer}
-            />
+          <div className="mb-4 max-sm:mb-2 sm:mb-5 break-inside-avoid">
+            <PanelSection title="Bonos CER" columnaPrecio={columnaPrecio} {...bonosCer} />
           </div>
-          <div className="mb-3 sm:mb-5 break-inside-avoid">
-            <PanelSection
-              title="CEDEARs principales"
-              columnaPrecio={columnaPrecio}
-              {...cedears}
-            />
+          <div className="mb-4 max-sm:mb-2 sm:mb-5 break-inside-avoid">
+            <PanelSection title="CEDEARs principales" columnaPrecio={columnaPrecio} {...cedears} />
           </div>
-          <div className="mb-3 sm:mb-5 break-inside-avoid">
-            <PanelSection
-              title="Índices"
-              columnaPrecio="Último"
-              {...indices}
-            />
+          <div className="mb-4 max-sm:mb-2 sm:mb-5 break-inside-avoid">
+            <PanelSection title="Índices" columnaPrecio="Último" {...indices} />
           </div>
-          <div className="mb-3 sm:mb-5 break-inside-avoid">
-            <PanelSection
-              title="Commodities"
-              columnaPrecio="Último"
-              {...commodities}
-            />
+          <div className="mb-4 max-sm:mb-2 sm:mb-5 break-inside-avoid">
+            <PanelSection title="Commodities" columnaPrecio="Último" {...commodities} />
           </div>
         </main>
       </div>

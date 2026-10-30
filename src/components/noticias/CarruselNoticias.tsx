@@ -14,7 +14,7 @@ const formateadorFecha = new Intl.DateTimeFormat("es-AR", {
 const SEGUNDOS_POR_TARJETA = 5;
 
 const claseTarjeta =
-  "flex h-full flex-col gap-2 sm:gap-3 rounded-lg border border-border/60 bg-card p-2.5 sm:p-4 transition-colors hover:border-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent";
+  "flex h-full flex-col gap-2 sm:gap-3 rounded-xl border border-border/60 bg-card/40 shadow-sm shadow-black/40 bg-card p-2 sm:p-4 transition-colors hover:border-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent";
 
 function Tarjeta({ noticia }: { noticia: NoticiaListado }) {
   const contenido = (

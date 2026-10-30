@@ -7,15 +7,14 @@ function formatFecha(fechaISO: string): string {
   return `${dia}/${mes}/${anio}`;
 }
 
-/** Fila destacada (fondo/borde acento): encabeza la lista de indicadores macro, resaltada del resto. */
+/** Fila destacada (fondo acento), una sola línea: encabeza la lista de indicadores macro. */
 export function RiesgoPaisCard({ riesgoPais }: { riesgoPais: RiesgoPais }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-accent/30 bg-accent/10 px-2.5 max-sm:px-2 py-2 max-sm:py-1.5">
-      <div>
-        <p className="text-xs font-semibold tracking-wide text-accent uppercase">Riesgo país</p>
-        <p className="text-[0.7rem] text-muted-foreground/70">Al {formatFecha(riesgoPais.fecha)}</p>
-      </div>
-      <p className="flex-none font-mono text-lg font-bold tabular-nums text-accent">
+    <div className="flex items-center justify-between gap-3 rounded-lg bg-accent/10 px-2.5 py-2.5">
+      <p className="min-w-0 truncate text-xs font-semibold tracking-wide text-accent uppercase">
+        Riesgo país <span className="font-normal text-accent/60 normal-case">· Al {formatFecha(riesgoPais.fecha)}</span>
+      </p>
+      <p className="flex-none font-mono text-base font-bold tabular-nums text-accent">
         {riesgoPais.valor.toLocaleString("es-AR")} <span className="text-xs font-medium">pb</span>
       </p>
     </div>

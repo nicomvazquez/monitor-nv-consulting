@@ -4,6 +4,7 @@ import {
   CEDEARS,
   CEDEARS_TOP_N,
   LETRAS,
+  PANEL_GENERAL,
   PANEL_LIDER,
   PESOS_ES_CER,
   PESOS_EXCLUYE_FX,
@@ -12,7 +13,7 @@ import {
   SUFIJO_DOLAR_MEP,
 } from "./config";
 import { isMercadoAbierto, revalidateSecondsPara } from "./market-hours";
-import type { CotizacionesPanelResponse, CotizacionPanelItem } from "./types";
+import type { AccionCompleta, CotizacionesPanelResponse, CotizacionPanelItem } from "./types";
 import type { FilaCotizacion, ModoPrecio } from "@/lib/types";
 
 /**
@@ -57,6 +58,41 @@ export async function getPanelLider(modo: ModoPrecio = "auto"): Promise<FilaCoti
     { revalidateSeconds: revalidateSecondsPara(mercadoAbierto) },
   );
   return titulos.map((item) => aFila(item, modo, mercadoAbierto));
+}
+
+/** Mismo criterio de cierre-vs-en-vivo que `aFila`, pero sin descartar ningún campo — ver `AccionCompleta`. */
+function aAccionCompleta(item: CotizacionPanelItem, modo: ModoPrecio, mercadoAbierto: boolean): AccionCompleta {
+  const mostrarCierre = modo === "cierre" || !mercadoAbierto;
+  const variacionValida = modo !== "cierre" || !mercadoAbierto;
+
+  return {
+    simbolo: item.simbolo,
+    descripcion: item.descripcion,
+    ultimoPrecio: mostrarCierre ? item.ultimoCierre : item.ultimoPrecio,
+    variacionPorcentual: variacionValida ? item.variacionPorcentual : null,
+    apertura: item.apertura,
+    maximo: item.maximo,
+    minimo: item.minimo,
+    ultimoCierre: item.ultimoCierre,
+    volumen: item.volumen,
+    cantidadOperaciones: item.cantidadOperaciones,
+    moneda: item.moneda,
+    fecha: item.fecha,
+    puntas: item.puntas,
+  };
+}
+
+/** Para `/acciones-argentinas`: todos los campos que da IOL, no solo los que usan las tablas del resto del sitio. */
+export async function getAccionesArgentinas(panel: "lider" | "general", modo: ModoPrecio = "auto"): Promise<AccionCompleta[]> {
+  const mercadoAbierto = await isMercadoAbierto();
+  const { instrumento, panel: nombrePanel, pais } = panel === "lider" ? PANEL_LIDER : PANEL_GENERAL;
+  const { titulos } = await iolFetch<CotizacionesPanelResponse>(
+    `/api/v2/Cotizaciones/${instrumento}/${encodeURIComponent(nombrePanel)}/${pais}`,
+    { revalidateSeconds: revalidateSecondsPara(mercadoAbierto) },
+  );
+  return titulos
+    .sort((a, b) => a.simbolo.localeCompare(b.simbolo))
+    .map((item) => aAccionCompleta(item, modo, mercadoAbierto));
 }
 
 export async function getBonosSoberanosDolaresMep(modo: ModoPrecio = "auto"): Promise<FilaCotizacion[]> {

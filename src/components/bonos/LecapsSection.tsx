@@ -1,5 +1,6 @@
 import type { LecapFila } from "@/lib/googlesheets/types";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { ModuloSeccion } from "@/components/ui/Modulo";
 import { LecapsTable } from "./LecapsTable";
 
 interface LecapsSectionProps {
@@ -9,12 +10,8 @@ interface LecapsSectionProps {
 
 export function LecapsSection({ filas, error }: LecapsSectionProps) {
   return (
-    <section className="flex flex-col gap-2 sm:gap-3">
-      <header>
-        <h2 className="text-base font-semibold text-foreground">Análisis de LECAPs</h2>
-      </header>
-
+    <ModuloSeccion titulo="Análisis de LECAPs">
       {error ? <ErrorMessage>{error}</ErrorMessage> : <LecapsTable filas={filas ?? []} />}
-    </section>
+    </ModuloSeccion>
   );
 }

@@ -1,5 +1,6 @@
 import type { BonoFila } from "@/lib/googlesheets/types";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { ModuloSeccion } from "@/components/ui/Modulo";
 import { BonosSheetTable } from "./BonosSheetTable";
 
 interface BonosSheetSectionProps {
@@ -9,12 +10,8 @@ interface BonosSheetSectionProps {
 
 export function BonosSheetSection({ filas, error }: BonosSheetSectionProps) {
   return (
-    <section className="flex flex-col gap-2 sm:gap-3">
-      <header>
-        <h2 className="text-base font-semibold text-foreground">Análisis de bonos soberanos</h2>
-      </header>
-
+    <ModuloSeccion titulo="Análisis de bonos soberanos">
       {error ? <ErrorMessage>{error}</ErrorMessage> : <BonosSheetTable filas={filas ?? []} />}
-    </section>
+    </ModuloSeccion>
   );
 }

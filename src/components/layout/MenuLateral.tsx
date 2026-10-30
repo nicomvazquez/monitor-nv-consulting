@@ -1,10 +1,12 @@
 "use client";
 
+import { List, X } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import type { Session } from "next-auth";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { cerrarSesion, iniciarSesionGoogle } from "@/lib/auth/actions";
+import { ENLACES_PRINCIPALES, GRUPOS, type Enlace } from "@/lib/nav";
 
 const SUSCRIBIRSE_NOOP = () => () => {};
 
@@ -17,16 +19,24 @@ function useMontado(): boolean {
   );
 }
 
-/**
- * Por ahora, los mismos links que ya tiene el header (ver `Header.tsx`) más
- * "Inicio" (que en el header vive en el logo, no como link de texto) — este
- * menú es el punto de partida para sumar más cosas después.
- */
-const ENLACES = [
-  { href: "/", label: "Inicio" },
-  { href: "/noticias", label: "Noticias" },
-  { href: "/calculadora-bonos", label: "Calculadora de bonos" },
-];
+function ItemEnlace({ href, label, descripcion, Icono, abierto, onNavegar }: Enlace & { abierto: boolean; onNavegar: () => void }) {
+  return (
+    <Link
+      href={href}
+      onClick={onNavegar}
+      tabIndex={abierto ? 0 : -1}
+      className="group flex min-h-14 items-center gap-3 rounded-xl px-2.5 py-2 transition-colors hover:bg-background"
+    >
+      <span className="flex size-9 flex-none items-center justify-center rounded-lg bg-accent/10 text-accent transition-colors group-hover:bg-accent/20">
+        <Icono size={18} weight="bold" aria-hidden="true" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-medium text-foreground">{label}</span>
+        <span className="block truncate text-xs text-muted-foreground">{descripcion}</span>
+      </span>
+    </Link>
+  );
+}
 
 /**
  * Menú de navegación que se desliza desde el lado derecho, superpuesto al
@@ -55,20 +65,16 @@ export function MenuLateral({ sesion }: { sesion: Session | null }) {
 
   return (
     <>
+      {/* size-11 (44px): mínimo recomendado de blanco de toque — a size-9 (36px), pegado al borde derecho de la
+          pantalla, varios celulares no llegan a registrar el toque (gesto de borde / alcance del pulgar). */}
       <button
         type="button"
         onClick={() => setAbierto(true)}
         aria-label="Abrir menú"
         aria-expanded={abierto}
-        className="inline-flex size-9 flex-none items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-card hover:text-accent"
+        className="-mr-1 inline-flex size-11 flex-none items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-card hover:text-accent"
       >
-        <svg viewBox="0 0 20 20" fill="currentColor" className="size-5">
-          <path
-            fillRule="evenodd"
-            d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm0 10.5a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75ZM2.75 9.25a.75.75 0 0 0 0 1.5h14.5a.75.75 0 0 0 0-1.5H2.75Z"
-            clipRule="evenodd"
-          />
-        </svg>
+        <List size={22} weight="bold" aria-hidden="true" />
       </button>
 
       {montado &&
@@ -92,48 +98,49 @@ export function MenuLateral({ sesion }: { sesion: Session | null }) {
               aria-modal="true"
               aria-label="Menú de navegación"
               className={
-                "absolute inset-y-0 right-0 flex w-72 max-w-[85vw] flex-col border-l border-accent/15 " +
-                "bg-background px-5 py-4 shadow-xl transition-transform duration-200 " +
+                "absolute inset-y-0 right-0 flex w-80 max-w-[85vw] flex-col border-l border-border " +
+                "bg-card px-3 py-3 shadow-2xl shadow-black/60 transition-transform duration-200 " +
                 (abierto ? "translate-x-0" : "translate-x-full")
               }
             >
-              <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Menú</span>
+              <div className="mb-4 flex items-center justify-between px-1">
+                <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Navegación</span>
                 <button
                   type="button"
                   onClick={() => setAbierto(false)}
                   aria-label="Cerrar menú"
                   tabIndex={abierto ? 0 : -1}
-                  className="inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-card hover:text-accent"
+                  className="-mr-1 inline-flex size-11 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-background hover:text-accent"
                 >
-                  <svg viewBox="0 0 20 20" fill="currentColor" className="size-5">
-                    <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-                  </svg>
+                  <X size={18} weight="bold" aria-hidden="true" />
                 </button>
               </div>
 
-              <nav className="flex flex-col gap-1">
-                {ENLACES.map((enlace) => (
-                  <Link
-                    key={enlace.href}
-                    href={enlace.href}
-                    onClick={() => setAbierto(false)}
-                    tabIndex={abierto ? 0 : -1}
-                    className="min-h-11 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-card hover:text-accent"
-                  >
-                    {enlace.label}
-                  </Link>
+              <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
+                {ENLACES_PRINCIPALES.map((enlace) => (
+                  <ItemEnlace key={enlace.href} {...enlace} abierto={abierto} onNavegar={() => setAbierto(false)} />
+                ))}
+
+                {GRUPOS.map((grupo) => (
+                  <div key={grupo.categoria} className="mt-2">
+                    <p className="px-2.5 pt-2 pb-1 text-[0.65rem] font-semibold tracking-wider text-muted-foreground/60 uppercase">
+                      {grupo.categoria}
+                    </p>
+                    {grupo.enlaces.map((enlace) => (
+                      <ItemEnlace key={enlace.href} {...enlace} abierto={abierto} onNavegar={() => setAbierto(false)} />
+                    ))}
+                  </div>
                 ))}
               </nav>
 
-              <div className="mt-auto border-t border-border/60 pt-3">
+              <div className="mt-auto border-t border-border pt-3">
                 {sesion?.user ? (
-                  <div className="flex items-center gap-2.5 px-1">
+                  <div className="flex items-center gap-2.5 rounded-xl bg-background px-2.5 py-2">
                     {sesion.user.image ? (
                       // eslint-disable-next-line @next/next/no-img-element -- avatar de Google, dominio externo variable: no vale la pena configurar remotePatterns para esto.
                       <img src={sesion.user.image} alt="" className="size-8 flex-none rounded-full" />
                     ) : (
-                      <div className="flex size-8 flex-none items-center justify-center rounded-full bg-card text-xs font-semibold text-accent">
+                      <div className="flex size-8 flex-none items-center justify-center rounded-full bg-accent/15 text-xs font-semibold text-accent">
                         {(sesion.user.name ?? sesion.user.email ?? "?").charAt(0).toUpperCase()}
                       </div>
                     )}

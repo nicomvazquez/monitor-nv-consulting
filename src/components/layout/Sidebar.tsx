@@ -1,9 +1,8 @@
 import type { BcraVariable } from "@/lib/bcra/types";
 import type { RiesgoPais } from "@/lib/argentinadatos/types";
 import type { FilaIndicador } from "@/lib/types";
-import { MacroSection } from "@/components/macro/MacroSection";
+import { IndicadoresMacro } from "@/components/macro/IndicadoresMacro";
 import { DescargarReporteButton } from "@/components/reportes/DescargarReporteButton";
-import { MacroUsaSection } from "@/components/macroUsa/MacroUsaSection";
 
 interface SidebarProps {
   indicadores: BcraVariable[] | null;
@@ -18,21 +17,29 @@ interface SidebarProps {
 }
 
 export function Sidebar({
+  indicadores,
+  error,
+  riesgoPais,
+  riesgoPaisError,
   indicadoresUsa,
   errorUsa,
   vix,
   vixError,
   estaLogueado,
-  ...macro
 }: SidebarProps) {
   return (
-    <aside className="flex w-full flex-col gap-4 lg:w-72 lg:flex-none">
+    <aside className="flex w-full flex-col gap-3 lg:w-80 lg:flex-none">
       <DescargarReporteButton estaLogueado={estaLogueado} />
-      {/* En mobile, los dos bloques macro van lado a lado; desde sm, apilados como siempre. */}
-      <div className="flex flex-col gap-4 max-sm:grid max-sm:grid-cols-2 max-sm:gap-3">
-        <MacroSection {...macro} />
-        <MacroUsaSection indicadores={indicadoresUsa} error={errorUsa} vix={vix} vixError={vixError} />
-      </div>
+      <IndicadoresMacro
+        indicadores={indicadores}
+        error={error}
+        riesgoPais={riesgoPais}
+        riesgoPaisError={riesgoPaisError}
+        indicadoresUsa={indicadoresUsa}
+        errorUsa={errorUsa}
+        vix={vix}
+        vixError={vixError}
+      />
     </aside>
   );
 }

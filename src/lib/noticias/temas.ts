@@ -11,6 +11,6 @@ export const TEMAS = [
 export type TemaId = (typeof TEMAS)[number]["id"] | "todos";
 
 /** Tema de un titular, o null si no matchea ninguno (igual se muestra, solo queda fuera de los filtros por tema). */
-export function temaDe(titulo: string): TemaId | null {
+export function temaDe(titulo: string): (typeof TEMAS)[number]["id"] | null {
   return TEMAS.find((tema) => tema.patron.test(titulo))?.id ?? null;
 }

@@ -22,16 +22,16 @@ const LOGO = readFileSync(path.join(process.cwd(), "public", "logo.png"));
 // --border, --accent, --accent-foreground. El reporte en PDF usa la misma
 // paleta en vez de una versión "para papel blanco" — es, visualmente, una
 // página más del sitio.
-const BG = "#0A0A0A";
-const CARD = "#171717";
-const TEXT = "#F5F5F5";
-const MUTED = "#A3A3A3";
-const BORDER = "#2E2E2E";
-const ACCENT = "#8ECAE6";
+const BG = "#020617";
+const CARD = "#0E1424";
+const TEXT = "#F8FAFC";
+const MUTED = "#94A3B8";
+const BORDER = "#243049";
+const ACCENT = "#7DD3FC";
 // Mismo tinte que usa el sitio en los estados hover (`bg-accent/5`): acento
 // al ~10% sobre `--card`, precalculado a un hex sólido porque el color de
 // fondo de react-pdf no soporta alfa de forma confiable.
-const ZEBRA = "#23292C";
+const ZEBRA = "#19273A";
 
 // Mismo par que `VariacionBadge` del sitio (emerald-400 / red-400 de
 // Tailwind). El fondo es ese mismo verde/rojo al ~10% sobre `--card`

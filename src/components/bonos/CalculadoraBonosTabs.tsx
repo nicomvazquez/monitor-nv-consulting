@@ -1,7 +1,9 @@
 "use client";
 
+import { Calculator } from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
 import type { BonoFila, LecapFila } from "@/lib/googlesheets/types";
+import { Modulo } from "@/components/ui/Modulo";
 import { BonosCurvaSection } from "./BonosCurvaSection";
 import { BonosSheetSection } from "./BonosSheetSection";
 import { CarryTradeSection } from "./CarryTradeSection";
@@ -49,21 +51,25 @@ export function CalculadoraBonosTabs({ bonos, lecaps, dolarMep }: CalculadoraBon
       </nav>
 
       {instrumento === "soberanos" ? (
-        <div className="flex flex-col gap-5 max-sm:gap-4">
-          <BonosSheetSection {...bonos} />
-          <div className="grid grid-cols-1 items-start gap-5 max-sm:gap-4 md:grid-cols-2">
-            <BonosCurvaSection {...bonos} seccion="ley local" titulo="Curva de rendimientos — Ley local" />
-            <BonosCurvaSection {...bonos} seccion="ley new york" titulo="Curva de rendimientos — Ley extranjera" />
+        <Modulo titulo="Bonos soberanos" descripcion="Precio, TIR, duration y convexidad en dólares" Icono={Calculator}>
+          <div className="flex flex-col gap-6">
+            <BonosSheetSection {...bonos} />
+            <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
+              <BonosCurvaSection {...bonos} seccion="ley local" titulo="Curva de rendimientos — Ley local" />
+              <BonosCurvaSection {...bonos} seccion="ley new york" titulo="Curva de rendimientos — Ley extranjera" />
+            </div>
           </div>
-        </div>
+        </Modulo>
       ) : (
-        <div className="flex flex-col gap-5 max-sm:gap-4">
-          <LecapsSection {...lecaps} />
-          <div className="grid grid-cols-1 items-start gap-5 max-sm:gap-4 md:grid-cols-2">
-            <LecapsCurvaSection {...lecaps} />
-            <CarryTradeSection {...lecaps} dolarMep={dolarMep} />
+        <Modulo titulo="LECAPs" descripcion="Precio, TEM/TNA y carry trade en pesos" Icono={Calculator}>
+          <div className="flex flex-col gap-6">
+            <LecapsSection {...lecaps} />
+            <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
+              <LecapsCurvaSection {...lecaps} />
+              <CarryTradeSection {...lecaps} dolarMep={dolarMep} />
+            </div>
           </div>
-        </div>
+        </Modulo>
       )}
     </div>
   );

@@ -16,24 +16,28 @@ export function formatValor({ unidadExpresion, moneda, ultValorInformado }: Bcra
     return formatPrice(ultValorInformado);
   }
   const prefijo = moneda === "ME" ? "US$" : "$";
-  // Espacio irrompible entre el número y la unidad: en el tile angosto de la
-  // grilla, un espacio normal ahí deja a la "M" sola colgando en su propia línea.
-  return `${prefijo} ${formatPrice(ultValorInformado)} M`;
+  // Espacio irrompible entre el número y la unidad: en una columna angosta,
+  // un espacio normal ahí deja a la "M" sola colgando en su propia línea.
+  return `${prefijo} ${formatPrice(ultValorInformado)} M`;
 }
 
-/** Fila compacta (no tarjeta): pensada para apilarse dentro de un único contenedor con bordes, como filas de tabla. */
-export function MacroCard({ variable }: { variable: BcraVariable }) {
+/**
+ * Fila de una sola línea (label + fecha abreviada, truncados juntos, más el
+ * valor a la derecha) — antes eran 2-3 líneas por fila (label, fecha y valor
+ * apilados en mobile), lo que hacía larguísima una lista de 7-8 indicadores.
+ * `title` en el contenedor recupera el texto completo si quedó truncado.
+ */
+export function MacroCard({ variable, zebra = false }: { variable: BcraVariable; zebra?: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-3 px-2.5 py-1.5 max-sm:flex-col max-sm:items-start max-sm:gap-0 max-sm:px-2 max-sm:py-1">
-      <div className="min-w-0">
-        <p className="truncate max-sm:line-clamp-2 max-sm:whitespace-normal text-xs text-muted-foreground">{variable.descripcion.replace(/\.$/, "")}</p>
-        <p className="text-[0.7rem] text-muted-foreground/60">
-          {formateadorFecha.format(new Date(variable.ultFechaInformada))}
-        </p>
-      </div>
-      <p className="flex-none font-mono text-sm font-semibold tabular-nums text-foreground">
-        {formatValor(variable)}
+    <div
+      title={variable.descripcion.replace(/\.$/, "")}
+      className={"flex items-center justify-between gap-3 px-2.5 py-2.5 transition-colors hover:bg-accent/10 " + (zebra ? "bg-white/[0.025]" : "")}
+    >
+      <p className="min-w-0 truncate text-xs text-muted-foreground">
+        {variable.descripcion.replace(/\.$/, "")}
+        <span className="text-muted-foreground/50"> · {formateadorFecha.format(new Date(variable.ultFechaInformada))}</span>
       </p>
+      <p className="flex-none font-mono text-sm font-semibold tabular-nums text-foreground">{formatValor(variable)}</p>
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { TituloTabla } from "@/components/ui/TituloTabla";
 
 type Formato = "pdf" | "png";
 
@@ -18,6 +19,11 @@ const ICONO_DESCARGA = (
  * usa la home), no es un archivo estático precalculado — por eso cada botón
  * muestra "Generando..." mientras espera la respuesta. El PNG parte del
  * mismo PDF (ver `obtenerReportePng`), no es un documento aparte.
+ *
+ * Tarjeta propia (antes era un bloque suelto arriba de "Indicadores macro",
+ * sin tarjeta): mismo header que el resto de las tarjetas-tabla del sitio
+ * (`TituloTabla`), para que se vea como un módulo más, no como un elemento
+ * huérfano flotando en el sidebar.
  */
 export function DescargarReporteButton({ estaLogueado }: { estaLogueado: boolean }) {
   const [generando, setGenerando] = useState<Formato | null>(null);
@@ -47,40 +53,40 @@ export function DescargarReporteButton({ estaLogueado }: { estaLogueado: boolean
     }
   }
 
-  if (!estaLogueado) {
-    return (
-      <div className="flex flex-col gap-1.5 rounded-lg border border-border px-3 py-2.5">
-        <p className="text-[0.7rem] font-medium uppercase tracking-wide text-muted-foreground">Descargar reporte</p>
-        <p className="text-xs text-muted-foreground">
-          <Link href="/login" className="font-medium text-accent hover:underline">
-            Iniciá sesión
-          </Link>{" "}
-          para descargar el reporte diario.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-1">
-      <p className="text-[0.7rem] font-medium uppercase tracking-wide text-muted-foreground">Descargar reporte</p>
-      <div className="flex gap-1.5">
-        {(["pdf", "png"] as const).map((formato) => (
-          <button
-            key={formato}
-            type="button"
-            onClick={() => descargar(formato)}
-            disabled={generando !== null}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-accent/30 bg-accent/10 px-3 py-2 text-xs font-medium text-accent transition-colors hover:bg-accent/15 disabled:cursor-wait disabled:opacity-70"
-          >
-            {ICONO_DESCARGA}
-            {generando === formato ? "Generando..." : formato.toUpperCase()}
-          </button>
-        ))}
+    <div className="overflow-hidden rounded-2xl border border-border bg-card/40 shadow-sm shadow-black/30">
+      <TituloTabla titulo="Reporte de cierre" />
+
+      <div className="p-3">
+        {!estaLogueado ? (
+          <p className="text-xs text-muted-foreground">
+            <Link href="/login" className="font-medium text-accent hover:underline">
+              Iniciá sesión
+            </Link>{" "}
+            para descargar el reporte diario.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-1.5">
+            <div className="flex gap-1.5">
+              {(["pdf", "png"] as const).map((formato) => (
+                <button
+                  key={formato}
+                  type="button"
+                  onClick={() => descargar(formato)}
+                  disabled={generando !== null}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-accent/30 bg-accent/10 px-3 py-2 text-xs font-medium text-accent transition-colors hover:bg-accent/15 disabled:cursor-wait disabled:opacity-70"
+                >
+                  {ICONO_DESCARGA}
+                  {generando === formato ? "Generando..." : formato.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            {error && (
+              <p className="text-[0.7rem] text-red-400">No se pudo generar el reporte. Probá de nuevo en unos minutos.</p>
+            )}
+          </div>
+        )}
       </div>
-      {error && (
-        <p className="text-[0.7rem] text-red-400">No se pudo generar el reporte. Probá de nuevo en unos minutos.</p>
-      )}
     </div>
   );
 }

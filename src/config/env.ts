@@ -18,4 +18,10 @@ export const env = {
   get fredApiKey() {
     return requireEnv("FRED_API_KEY");
   },
+  get doctaClientId() {
+    return requireEnv("DOCTA_CLIENT_ID");
+  },
+  get doctaClientSecret() {
+    return requireEnv("DOCTA_CLIENT_SECRET");
+  },
 };

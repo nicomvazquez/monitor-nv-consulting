@@ -16,6 +16,19 @@ export const PANEL_LIDER = {
 } as const;
 
 /**
+ * El panel de acciones argentinas más chicas que no entran en el Panel
+ * Líder (small/mid-caps: Grupo Clarín, Mirgor, Molinos, Banco Hipotecario,
+ * etc. — verificado a mano, ~49 títulos). El nombre lleva un espacio
+ * literal, a diferencia de "merval" — ver el `encodeURIComponent` en
+ * `getAccionesArgentinas`.
+ */
+export const PANEL_GENERAL = {
+  instrumento: "acciones",
+  panel: "Panel General",
+  pais: "argentina",
+} as const;
+
+/**
  * La API de IOL ignora el segmento "panel" para bonos (siempre devuelve el
  * universo completo de títulos), así que "Soberanos" acá es solo un nombre
  * descriptivo: el filtro real por bono soberano en dólares se hace en

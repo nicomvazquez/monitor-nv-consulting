@@ -39,7 +39,7 @@ export function BonosCurvaChart({ filas, seccion }: { filas: BonoFila[]; seccion
 
   if (puntos.length === 0) {
     return (
-      <div className="flex items-center justify-center rounded-lg border border-border/60 p-8">
+      <div className="flex items-center justify-center rounded-lg border border-border/50 p-5 sm:p-8">
         <p className="text-sm text-muted-foreground">No hay datos para graficar la curva.</p>
       </div>
     );
@@ -85,7 +85,7 @@ export function BonosCurvaChart({ filas, seccion }: { filas: BonoFila[]; seccion
   });
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border/60 p-2.5 sm:p-4">
+    <div className="flex flex-col gap-3 rounded-lg border border-border/50 p-2 sm:p-4">
       <svg
         viewBox={`0 0 ${ANCHO} ${ALTO}`}
         className="h-auto w-full"

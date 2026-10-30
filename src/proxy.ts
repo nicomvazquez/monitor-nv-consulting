@@ -7,5 +7,5 @@ export { auth as proxy } from "@/auth";
  * un redirect no tiene sentido (la descarga espera un archivo, no una página).
  */
 export const config = {
-  matcher: ["/noticias/:path*", "/calculadora-bonos/:path*"],
+  matcher: ["/noticias/:path*", "/calculadora-bonos/:path*", "/analisis-acciones/:path*", "/acciones-argentinas/:path*"],
 };

@@ -1,5 +1,6 @@
 import type { LecapFila } from "@/lib/googlesheets/types";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { ModuloSeccion } from "@/components/ui/Modulo";
 import { LecapsCurvaChart } from "./LecapsCurvaChart";
 
 interface LecapsCurvaSectionProps {
@@ -9,12 +10,8 @@ interface LecapsCurvaSectionProps {
 
 export function LecapsCurvaSection({ filas, error }: LecapsCurvaSectionProps) {
   return (
-    <section className="flex flex-col gap-2 sm:gap-3">
-      <header>
-        <h2 className="text-base font-semibold text-foreground">Curva de rendimientos — LECAPs</h2>
-      </header>
-
+    <ModuloSeccion titulo="Curva de rendimientos — LECAPs">
       {error ? <ErrorMessage>{error}</ErrorMessage> : <LecapsCurvaChart filas={filas ?? []} />}
-    </section>
+    </ModuloSeccion>
   );
 }

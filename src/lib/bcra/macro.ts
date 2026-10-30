@@ -25,7 +25,7 @@ const ID_UVA_SINTETICO = -1;
 /**
  * UVA no es del BCRA sino de ArgentinaDatos (`lib/argentinadatos/uva.ts`),
  * pero se arma como si fuera una `BcraVariable` más para que
- * `MacroSection`/`MacroCard` la rendericen gratis, sin tocar ese componente.
+ * `IndicadoresMacro`/`MacroCard` la rendericen gratis, sin tocar ese componente.
  * Best-effort aparte del resto: si falla, no tira abajo el panel entero, solo
  * no se agrega esta fila.
  */

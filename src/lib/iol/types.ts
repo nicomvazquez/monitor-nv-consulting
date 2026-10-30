@@ -40,6 +40,29 @@ export interface CotizacionesPanelResponse {
 }
 
 /**
+ * Igual que `CotizacionPanelItem`, pero con `ultimoPrecio`/`variacionPorcentual`
+ * ya resueltos según el modo (cierre o en vivo) — ver `aAccionCompleta` en
+ * `cotizaciones.ts`. A diferencia de `FilaCotizacion` (la forma mínima que
+ * usan las tablas del sitio), esta no descarta ningún campo: es la fila
+ * "con todos los datos posibles" de `/acciones-argentinas`.
+ */
+export interface AccionCompleta {
+  simbolo: string;
+  descripcion: string;
+  ultimoPrecio: number;
+  variacionPorcentual: number | null;
+  apertura: number;
+  maximo: number;
+  minimo: number;
+  ultimoCierre: number;
+  volumen: number;
+  cantidadOperaciones: number;
+  moneda: string;
+  fecha: string;
+  puntas: PuntaCotizacion;
+}
+
+/**
  * Forma real (verificada a mano) de cada elemento dentro de `titulos` en la
  * respuesta de GET /api/v2/Cotizaciones/cauciones/todas/argentina.
  * `tasaPromedio` es el promedio ponderado de las operaciones del día para

@@ -28,7 +28,7 @@ export function BonosSheetTable({ filas }: { filas: BonoFila[] }) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-border/60">
+    <div className="overflow-x-auto rounded-lg border border-border/50">
       <table className="min-w-full divide-y divide-border/60 text-left text-xs sm:text-sm">
         <thead className="bg-card">
           <tr>

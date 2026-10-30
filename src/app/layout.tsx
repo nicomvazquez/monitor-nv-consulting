@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { auth } from "@/auth";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { getCryptosIniciales } from "@/lib/binance/cryptos";
 import { getDolares } from "@/lib/dolarapi/dolares";
 
-const inter = Inter({
-  variable: "--font-inter",
+// Reemplaza a Inter: "financial, trustworthy, professional" es justo el tono
+// que pide un dashboard de mercado — y sigue siendo tan legible como Inter
+// en tamaños chicos, que acá abundan (tablas densas).
+const plexSans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -47,16 +52,27 @@ async function fetchDolares() {
   }
 }
 
+/** Para el precio al lado del logo en el header — se pide acá (no en cada página) porque el header vive en el layout raíz y se muestra en todo el sitio. */
+async function fetchBtc() {
+  try {
+    const cryptos = await getCryptosIniciales();
+    return cryptos.find((c) => c.simbolo === "BTC") ?? null;
+  } catch (cause) {
+    console.error("[btc-header]", cause);
+    return null;
+  }
+}
+
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const [dolares, sesion] = await Promise.all([fetchDolares(), auth()]);
+  const [dolares, btc, sesion] = await Promise.all([fetchDolares(), fetchBtc(), auth()]);
 
   return (
     <html
       lang="es"
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${plexSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Header dolares={dolares.dolares} error={dolares.error} sesion={sesion} />
+        <Header dolares={dolares.dolares} error={dolares.error} btc={btc} sesion={sesion} />
         {children}
         <Footer />
       </body>

@@ -30,14 +30,14 @@ export default async function NoticiasPage() {
   const { noticias, error } = await fetchNoticias();
 
   return (
-    <main className="mx-auto flex w-full max-w-[100rem] flex-1 flex-col gap-6 max-sm:gap-3 px-2 py-3 sm:px-6 sm:py-6">
+    <main className="mx-auto flex w-full max-w-[100rem] flex-1 flex-col gap-6 max-sm:gap-3 px-1 py-2 sm:px-6 sm:py-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Noticias del mercado</h1>
         <p className="mt-1 text-xs sm:text-sm text-muted-foreground">Fuente: Google Noticias. El número de medios indica cuántos publican el mismo hecho.</p>
       </div>
 
       {error && (
-        <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300 max-sm:px-2.5 max-sm:py-2">
           {error}
         </p>
       )}

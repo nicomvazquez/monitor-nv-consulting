@@ -1,4 +1,4 @@
-import { Calculator, ChartLineUp, CurrencyBtc, House, Newspaper, Scroll, Table } from "@phosphor-icons/react/dist/ssr";
+import { Calculator, ChartLineUp, CurrencyBtc, Globe, House, Newspaper, Scroll, Table } from "@phosphor-icons/react/dist/ssr";
 import type { Icon } from "@phosphor-icons/react";
 
 /**
@@ -27,6 +27,7 @@ export const GRUPOS: { categoria: string; enlaces: Enlace[] }[] = [
     enlaces: [
       { href: "/analisis-acciones", label: "Análisis de acciones", descripcion: "Mapa de calor sectorizado del Panel Líder", Icono: ChartLineUp },
       { href: "/acciones-argentinas", label: "Acciones argentinas", descripcion: "Panel Líder y General, con fundamentals", Icono: Table },
+      { href: "/acciones-internacionales", label: "Acciones internacionales", descripcion: "CEDEARs, con fundamentals de la empresa original", Icono: Globe },
     ],
   },
   {
@@ -38,6 +39,6 @@ export const GRUPOS: { categoria: string; enlaces: Enlace[] }[] = [
   },
   {
     categoria: "Cripto",
-    enlaces: [{ href: "/cripto", label: "Cripto", descripcion: "Próximamente", Icono: CurrencyBtc }],
+    enlaces: [{ href: "/cripto", label: "Cripto", descripcion: "Mapa de calor, cotizaciones y ficha de análisis por moneda", Icono: CurrencyBtc }],
   },
 ];

@@ -6,12 +6,11 @@ import { VariacionBadge } from "@/components/cotizaciones/VariacionBadge";
 import { formatPrice, formatVolumen } from "@/lib/format";
 import type { AccionCompleta } from "@/lib/iol/types";
 
-type Panel = "lider" | "general";
-
-const NOMBRE_PANEL: Record<Panel, string> = {
-  lider: "Panel Líder",
-  general: "Panel General",
-};
+export interface PanelAcciones {
+  id: string;
+  etiqueta: string;
+  datos: AccionCompleta[];
+}
 
 function Th({ children, derecha = false }: { children: React.ReactNode; derecha?: boolean }) {
   return (
@@ -41,26 +40,26 @@ function Td({ children, derecha = false, muted = false }: { children: React.Reac
   );
 }
 
-export function TablaAccionesCompleta({ lider, general }: { lider: AccionCompleta[]; general: AccionCompleta[] }) {
+export function TablaAccionesCompleta({ paneles, rutaBase }: { paneles: PanelAcciones[]; rutaBase: string }) {
   const router = useRouter();
-  const [panel, setPanel] = useState<Panel>("lider");
-  const datos = panel === "lider" ? lider : general;
+  const [panelId, setPanelId] = useState(paneles[0].id);
+  const datos = paneles.find((panel) => panel.id === panelId)?.datos ?? [];
 
   return (
     <div className="flex flex-col gap-3">
       <div className="inline-flex w-fit gap-1 rounded-xl border border-border bg-card/40 p-1">
-        {(["lider", "general"] as const).map((opcion) => (
+        {paneles.map((panel) => (
           <button
-            key={opcion}
+            key={panel.id}
             type="button"
-            onClick={() => setPanel(opcion)}
+            onClick={() => setPanelId(panel.id)}
             className={
               "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors " +
-              (panel === opcion ? "bg-accent/15 text-accent" : "text-muted-foreground hover:text-foreground")
+              (panelId === panel.id ? "bg-accent/15 text-accent" : "text-muted-foreground hover:text-foreground")
             }
           >
-            {NOMBRE_PANEL[opcion]}
-            <span className="ml-1.5 font-mono text-xs tabular-nums opacity-70">{opcion === "lider" ? lider.length : general.length}</span>
+            {panel.etiqueta}
+            <span className="ml-1.5 font-mono text-xs tabular-nums opacity-70">{panel.datos.length}</span>
           </button>
         ))}
       </div>
@@ -93,7 +92,7 @@ export function TablaAccionesCompleta({ lider, general }: { lider: AccionComplet
               {datos.map((accion) => (
                 <tr
                   key={accion.simbolo}
-                  onClick={() => router.push(`/acciones-argentinas/${accion.simbolo}`)}
+                  onClick={() => router.push(`${rutaBase}/${accion.simbolo}`)}
                   className="cursor-pointer transition-colors hover:bg-accent/5"
                   title="Ver fundamentals"
                 >
@@ -120,7 +119,7 @@ export function TablaAccionesCompleta({ lider, general }: { lider: AccionComplet
                     {formatPrice(accion.ultimoCierre)}
                   </Td>
                   <Td derecha muted>
-                    {accion.puntas.precioCompra !== null ? (
+                    {accion.puntas?.precioCompra != null ? (
                       <>
                         {formatPrice(accion.puntas.precioCompra)}
                         {accion.puntas.cantidadCompra !== null && (
@@ -132,7 +131,7 @@ export function TablaAccionesCompleta({ lider, general }: { lider: AccionComplet
                     )}
                   </Td>
                   <Td derecha muted>
-                    {accion.puntas.precioVenta !== null ? (
+                    {accion.puntas?.precioVenta != null ? (
                       <>
                         {formatPrice(accion.puntas.precioVenta)}
                         {accion.puntas.cantidadVenta !== null && (

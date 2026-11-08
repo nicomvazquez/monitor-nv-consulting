@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { CSSProperties } from "react";
 import type { NoticiaListado } from "./ListadoNoticias";
 
@@ -44,21 +43,7 @@ function Tarjeta({ noticia }: { noticia: NoticiaListado }) {
 
 export function CarruselNoticias({ noticias }: { noticias: NoticiaListado[] }) {
   return (
-    <section aria-labelledby="titulo-noticias-destacadas" className="flex flex-col gap-2 sm:gap-3">
-      <div className="flex items-end justify-between gap-3">
-        <div className="flex flex-col gap-0.5">
-          <h2 id="titulo-noticias-destacadas" className="text-sm font-semibold text-foreground">
-            Noticias destacadas
-          </h2>
-        </div>
-        <Link
-          href="/noticias"
-          className="inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-medium text-accent underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:min-h-9"
-        >
-          Ver todas
-        </Link>
-      </div>
-
+    <section aria-label="Noticias destacadas" className="flex flex-col gap-2 sm:gap-3">
       {/* Mismo patrón que el carrusel de dólares: el track está duplicado (ver @keyframes marquee en globals.css)
           para que el loop sea continuo. La copia va `inert` para que no se repita al tabular ni al leer con lector de pantalla. */}
       <div className="group overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] motion-reduce:overflow-x-auto motion-reduce:[mask-image:none]">

@@ -41,3 +41,13 @@ export interface FilaIndicador {
  * lo usa el reporte en PDF, que nunca debe mostrar un precio en vivo.
  */
 export type ModoPrecio = "auto" | "cierre";
+
+/**
+ * Un punto de una serie de precio en el tiempo — lo que necesita
+ * `GraficoCotizacion` para graficar, sin atarse a qué fuente lo trajo
+ * (Yahoo Finance para acciones/CEDEARs, CoinGecko para cripto).
+ */
+export interface PuntoPrecio {
+  fecha: string;
+  cierre: number;
+}

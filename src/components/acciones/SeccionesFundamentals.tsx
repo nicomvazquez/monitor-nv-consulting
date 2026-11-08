@@ -23,12 +23,12 @@ function fecha(valor: Date | string | null | undefined): string {
   return d.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-interface Campo {
+export interface Campo {
   etiqueta: string;
   valor: string;
 }
 
-interface Seccion {
+export interface Seccion {
   titulo: string;
   campos: Campo[];
 }

@@ -56,5 +56,5 @@ export function CryptoLivePanel({ inicial }: { inicial: FilaCotizacion[] }) {
     };
   }, []);
 
-  return <CotizacionesTable titulo="Criptomonedas" items={items} mostrarVolumen />;
+  return <CotizacionesTable titulo="Criptomonedas" items={items} mostrarVolumen rutaBase="/cripto" />;
 }

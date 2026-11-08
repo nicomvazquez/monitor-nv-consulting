@@ -40,7 +40,13 @@ export default async function AccionesArgentinasPage() {
 
       {!error && (
         <Modulo titulo="Cotizaciones" descripcion="Elegí el panel para ver sus acciones" Icono={Table}>
-          <TablaAccionesCompleta lider={lider} general={general} />
+          <TablaAccionesCompleta
+            rutaBase="/acciones-argentinas"
+            paneles={[
+              { id: "lider", etiqueta: "Panel Líder", datos: lider },
+              { id: "general", etiqueta: "Panel General", datos: general },
+            ]}
+          />
         </Modulo>
       )}
     </main>

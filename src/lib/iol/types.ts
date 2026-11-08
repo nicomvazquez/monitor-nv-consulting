@@ -32,7 +32,8 @@ export interface CotizacionPanelItem {
   fecha: string;
   mercado: string;
   moneda: string;
-  puntas: PuntaCotizacion;
+  /** `null` cuando el título no tiene puntas vigentes (pasa con CEDEARs poco líquidos del Panel General) — verificado contra la API real. */
+  puntas: PuntaCotizacion | null;
 }
 
 export interface CotizacionesPanelResponse {
@@ -59,7 +60,7 @@ export interface AccionCompleta {
   cantidadOperaciones: number;
   moneda: string;
   fecha: string;
-  puntas: PuntaCotizacion;
+  puntas: PuntaCotizacion | null;
 }
 
 /**

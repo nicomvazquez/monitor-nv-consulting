@@ -10,6 +10,11 @@ import Google from "next-auth/providers/google";
  */
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Google],
+  // Sin esto, Auth.js arma la URL de redirect de OAuth contra "http://localhost:3000" en vez
+  // de detectar el dominio real de la request — verificado a mano contra producción: Google
+  // devolvía "redirect_uri_mismatch" con localhost:3000 en el redirect_uri, aunque se entrara
+  // por el dominio real de Vercel.
+  trustHost: true,
   pages: {
     signIn: "/login",
   },

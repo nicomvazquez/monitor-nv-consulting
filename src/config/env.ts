@@ -24,4 +24,7 @@ export const env = {
   get doctaClientSecret() {
     return requireEnv("DOCTA_CLIENT_SECRET");
   },
+  get coingeckoApiKey() {
+    return requireEnv("COINGECKO_API_KEY");
+  },
 };

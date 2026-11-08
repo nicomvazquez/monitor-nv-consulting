@@ -1,5 +1,6 @@
 import { iolFetch } from "./client";
 import {
+  ACCIONES_INTERNACIONALES_TOP_N,
   BONOS,
   CEDEARS,
   CEDEARS_TOP_N,
@@ -93,6 +94,31 @@ export async function getAccionesArgentinas(panel: "lider" | "general", modo: Mo
   return titulos
     .sort((a, b) => a.simbolo.localeCompare(b.simbolo))
     .map((item) => aAccionCompleta(item, modo, mercadoAbierto));
+}
+
+/**
+ * Para `/acciones-internacionales`: todos los campos de `getAccionesArgentinas`,
+ * pero sobre el panel de CEDEARs — "top20" son los más operados del día,
+ * "general" son todos. Un solo fetch para los dos paneles (935 títulos,
+ * ~670KB): pedirlo dos veces en paralelo —una por panel— duplicaba ese
+ * pedido pesado sin necesidad, ya que ambos paneles salen del mismo panel
+ * de IOL cortado distinto.
+ */
+export async function getAccionesInternacionales(modo: ModoPrecio = "auto"): Promise<{ top20: AccionCompleta[]; general: AccionCompleta[] }> {
+  const mercadoAbierto = await isMercadoAbierto();
+  const { instrumento, panel: nombrePanel, pais } = CEDEARS;
+  const { titulos } = await iolFetch<CotizacionesPanelResponse>(
+    `/api/v2/Cotizaciones/${instrumento}/${encodeURIComponent(nombrePanel)}/${pais}`,
+    { revalidateSeconds: revalidateSecondsPara(mercadoAbierto) },
+  );
+
+  // Misma razón que `getCedearsPrincipales`: nos quedamos con la versión en pesos de cada CEDEAR.
+  const enPesos = titulos.filter((titulo) => titulo.moneda === "AR$");
+  const top20 = [...enPesos].sort((a, b) => b.cantidadOperaciones - a.cantidadOperaciones).slice(0, ACCIONES_INTERNACIONALES_TOP_N);
+
+  const ordenar = (lista: typeof enPesos) => lista.sort((a, b) => a.simbolo.localeCompare(b.simbolo)).map((item) => aAccionCompleta(item, modo, mercadoAbierto));
+
+  return { top20: ordenar(top20), general: ordenar(enPesos) };
 }
 
 export async function getBonosSoberanosDolaresMep(modo: ModoPrecio = "auto"): Promise<FilaCotizacion[]> {

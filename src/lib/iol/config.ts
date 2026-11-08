@@ -106,6 +106,9 @@ export const CEDEARS = {
  */
 export const CEDEARS_TOP_N = 25;
 
+/** Para `/acciones-internacionales`: cuántos CEDEARs entran en el panel "20 más operados", a diferencia del `CEDEARS_TOP_N` (25) que usan la home y el reporte diario. */
+export const ACCIONES_INTERNACIONALES_TOP_N = 20;
+
 /** Cada cuántos segundos se refrescan las cotizaciones mientras el mercado está operando. */
 export const REVALIDATE_SECONDS_MERCADO_ABIERTO = 60;
 

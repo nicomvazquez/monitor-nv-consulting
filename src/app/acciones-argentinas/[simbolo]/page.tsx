@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowLeft, Bank, Buildings, ChartBar, ChartLineUp, Coins, Percent, Receipt, Scales, Target, UsersThree } from "@phosphor-icons/react/dist/ssr";
 import type { Icon } from "@phosphor-icons/react";
-import { GraficoCotizacion } from "@/components/acciones/GraficoCotizacion";
+import { GraficoCotizacion } from "@/components/cotizaciones/GraficoCotizacion";
 import { construirSecciones, SeccionFundamentals } from "@/components/acciones/SeccionesFundamentals";
 import { Modulo } from "@/components/ui/Modulo";
 import { getFundamentals, getHistorialPrecio } from "@/lib/yahoofinance/fundamentals";

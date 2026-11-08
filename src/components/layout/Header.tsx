@@ -101,16 +101,7 @@ export function Header({
             {error}
           </div>
         ) : dolares && dolares.length > 0 ? (
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-1.5 px-0.5">
-              <span className="relative flex size-1.5">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
-              </span>
-              <span className="text-[0.65rem] font-medium tracking-wide text-muted-foreground uppercase">Cotizaciones en vivo</span>
-            </div>
-            <DolaresCarousel dolares={dolares} />
-          </div>
+          <DolaresCarousel dolares={dolares} />
         ) : null}
       </div>
     </header>

@@ -45,3 +45,14 @@ export const COMMODITIES = [
 
 /** Cada cuántos segundos se revalida cualquier cotización de Yahoo Finance (índices y commodities). */
 export const REVALIDATE_SECONDS_YAHOO = 5 * 60;
+
+/**
+ * Para `getFundamentals`/`getHistorialPrecio` (fichas de `/acciones-argentinas/[simbolo]`
+ * y `/acciones-internacionales/[simbolo]`): a diferencia del resto de este archivo, esos
+ * dos no pasan por `fetch()` directamente sino por el cliente HTTP interno de
+ * `yahoo-finance2`, que no cachea nada por su cuenta — sin esto, cada visita a una ficha
+ * (financials, dividendos, analistas, 6 meses de histórico) le pegaba a Yahoo de nuevo
+ * desde cero. Más generoso que `REVALIDATE_SECONDS_YAHOO` porque estos datos (a diferencia
+ * de un precio en vivo) cambian poco de una media hora a la otra.
+ */
+export const REVALIDATE_SECONDS_FUNDAMENTALS = 30 * 60;

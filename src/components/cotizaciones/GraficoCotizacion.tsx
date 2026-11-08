@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { formatPrice } from "@/lib/format";
-import type { PuntoPrecio } from "@/lib/yahoofinance/fundamentals";
+import type { PuntoPrecio } from "@/lib/types";
 
 const ANCHO = 640;
 const ALTO = 220;
@@ -32,11 +32,7 @@ export function GraficoCotizacion({ historial }: { historial: PuntoPrecio[] }) {
   const [indiceActivo, setIndiceActivo] = useState<number | null>(null);
 
   if (historial.length < 2) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        No hay suficiente historial de Yahoo Finance para graficar esta acción.
-      </p>
-    );
+    return <p className="text-sm text-muted-foreground">No hay suficiente historial para graficar esta cotización.</p>;
   }
 
   const cierres = historial.map((p) => p.cierre);

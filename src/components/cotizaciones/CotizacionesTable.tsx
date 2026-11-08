@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import type { FilaCotizacion } from "@/lib/types";
 import { formatPrice, formatVolumen } from "@/lib/format";
 import { TituloTabla } from "@/components/ui/TituloTabla";
@@ -12,6 +15,8 @@ interface CotizacionesTableProps {
   mostrarVolumen?: boolean;
   /** Título de la columna de precio: "Último" con mercado abierto, "Cierre" con mercado cerrado. */
   columnaPrecio?: string;
+  /** Si se pasa, cada fila navega a `${rutaBase}/${simbolo}` al hacer click (ej. la ficha de análisis de una cripto). Sin esto, las filas no son clickeables. */
+  rutaBase?: string;
 }
 
 /**
@@ -32,7 +37,10 @@ export function CotizacionesTable({
   mostrarVariacion = true,
   mostrarVolumen = false,
   columnaPrecio = "Último",
+  rutaBase,
 }: CotizacionesTableProps) {
+  const router = useRouter();
+
   if (items.length === 0) {
     return (
       <div className="overflow-hidden rounded-2xl border border-border bg-card/40 shadow-sm shadow-black/30">
@@ -88,7 +96,12 @@ export function CotizacionesTable({
             {items.map((item, i) => (
               <tr
                 key={item.simbolo}
-                className={"transition-colors hover:bg-accent/10 " + (i % 2 === 1 ? "bg-white/[0.025]" : "")}
+                onClick={rutaBase ? () => router.push(`${rutaBase}/${item.simbolo}`) : undefined}
+                className={
+                  "transition-colors hover:bg-accent/10 " +
+                  (rutaBase ? "cursor-pointer " : "") +
+                  (i % 2 === 1 ? "bg-white/[0.025]" : "")
+                }
               >
                 <td className="px-3.5 py-2.5 max-sm:px-2 max-sm:py-1.5 font-medium text-foreground">
                   {item.simbolo}

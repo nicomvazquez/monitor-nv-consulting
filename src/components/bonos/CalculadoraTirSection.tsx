@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { calcularInversion, calcularTirDesdeCashflow } from "@/lib/bonos/calculoTir";
 import type { DatosCalculadoraTir, BonoSeleccionable } from "@/lib/docta/calculadoraTir";
 import { formatPercent, formatPrice, formatTasa } from "@/lib/format";
+import { Spinner } from "@/components/ui/Spinner";
 
 const claseCampo =
   "min-h-11 w-full rounded-xl border border-border/60 bg-card/40 shadow-sm shadow-black/40 bg-card px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:min-h-9";
@@ -252,7 +253,12 @@ export function CalculadoraTirSection({ instrumentos, tickerSeleccionado, datos,
         </select>
       </div>
 
-      {pendiente && <p className="text-sm text-muted-foreground">Cargando cronograma de pagos…</p>}
+      {pendiente && (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Spinner className="size-4 text-accent" />
+          Cargando cronograma de pagos…
+        </p>
+      )}
 
       {!pendiente && error && (
         <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">

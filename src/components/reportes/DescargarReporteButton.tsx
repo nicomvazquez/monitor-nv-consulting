@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { Spinner } from "@/components/ui/Spinner";
 import { TituloTabla } from "@/components/ui/TituloTabla";
 
 type Formato = "pdf" | "png";
@@ -76,7 +77,7 @@ export function DescargarReporteButton({ estaLogueado }: { estaLogueado: boolean
                   disabled={generando !== null}
                   className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-accent/30 bg-accent/10 px-3 py-2 text-xs font-medium text-accent transition-colors hover:bg-accent/15 disabled:cursor-wait disabled:opacity-70"
                 >
-                  {ICONO_DESCARGA}
+                  {generando === formato ? <Spinner className="size-4" /> : ICONO_DESCARGA}
                   {generando === formato ? "Generando..." : formato.toUpperCase()}
                 </button>
               ))}

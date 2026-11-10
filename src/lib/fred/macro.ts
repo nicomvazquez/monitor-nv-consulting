@@ -21,7 +21,7 @@ interface SerieFred {
  * oferta monetaria M2 (equivalente a "base monetaria"), PBI trimestral y el
  * rendimiento del bono del Tesoro a 10 años (la "tasa libre de riesgo" de
  * referencia global, comparable contra la TIR de los bonos soberanos
- * argentinos de `/calculadora-bonos`).
+ * argentinos de `/bonos`).
  */
 const SERIES: SerieFred[] = [
   { id: "FEDFUNDS", nombre: "Tasa de la Fed", formatear: (v) => `${formatPrice(v)}%` },

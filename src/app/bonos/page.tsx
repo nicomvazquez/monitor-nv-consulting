@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { CalculadoraBonosTabs } from "@/components/bonos/CalculadoraBonosTabs";
+import { BonosTabs } from "@/components/bonos/BonosTabs";
 import { getDolares } from "@/lib/dolarapi/dolares";
 import { getBonosSheet } from "@/lib/googlesheets/bonos";
 import { getLecapsSheet } from "@/lib/googlesheets/lecaps";
 
 export const metadata: Metadata = {
-  title: "Calculadora de bonos",
+  title: "Bonos",
   description:
     "Precio, TIR, duration y convexidad de bonos soberanos argentinos en dólares (ley local y ley " +
     "extranjera) y de LECAPs en pesos, con curvas de rendimiento y regresión para identificar bonos " +
@@ -48,7 +48,7 @@ async function fetchDolarMep() {
   }
 }
 
-export default async function CalculadoraBonosPage() {
+export default async function BonosPage() {
   const [bonosSheet, lecapsSheet, dolarMep] = await Promise.all([
     fetchBonosSheet(),
     fetchLecapsSheet(),
@@ -58,10 +58,10 @@ export default async function CalculadoraBonosPage() {
   return (
     <main className="mx-auto flex w-full max-w-[100rem] flex-1 flex-col gap-8 max-sm:gap-4 px-6 max-sm:px-1 py-8 max-sm:py-2">
       <div>
-        <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Calculadora de bonos</h1>
+        <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Bonos</h1>
       </div>
 
-      <CalculadoraBonosTabs bonos={bonosSheet} lecaps={lecapsSheet} dolarMep={dolarMep} />
+      <BonosTabs bonos={bonosSheet} lecaps={lecapsSheet} dolarMep={dolarMep} />
     </main>
   );
 }

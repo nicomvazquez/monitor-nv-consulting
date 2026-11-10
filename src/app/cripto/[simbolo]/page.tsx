@@ -33,9 +33,9 @@ export async function generateMetadata({ params }: { params: Promise<{ simbolo: 
 
 function EnlaceVolver() {
   return (
-    <Link href="/cripto" className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-accent">
+    <Link href="/criptomonedas" className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-accent">
       <ArrowLeft size={16} weight="bold" aria-hidden="true" />
-      Cripto
+      Criptomonedas
     </Link>
   );
 }

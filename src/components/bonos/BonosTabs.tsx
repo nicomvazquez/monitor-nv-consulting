@@ -19,14 +19,14 @@ const claseTab = (activo: boolean) =>
       : "border-border/60 text-muted-foreground hover:border-accent/50 hover:text-foreground"
   }`;
 
-interface CalculadoraBonosTabsProps {
+interface BonosTabsProps {
   bonos: { filas: BonoFila[] | null; error: string | null };
   lecaps: { filas: LecapFila[] | null; error: string | null };
   dolarMep: { compra: number; venta: number } | null;
 }
 
-/** Mini navbar para elegir entre bonos soberanos (en dólares) y LECAPs (en pesos): son instrumentos con métricas distintas, mezclarlos en una sola tabla no tendría sentido. */
-export function CalculadoraBonosTabs({ bonos, lecaps, dolarMep }: CalculadoraBonosTabsProps) {
+/** Mini navbar para elegir entre bonos soberanos (en dólares) y LECAPs (en pesos): son cuadros con datos y métricas distintas, mezclarlos en uno solo no tendría sentido. */
+export function BonosTabs({ bonos, lecaps, dolarMep }: BonosTabsProps) {
   const [instrumento, setInstrumento] = useState<Instrumento>("soberanos");
 
   return (

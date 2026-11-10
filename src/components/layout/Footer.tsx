@@ -5,7 +5,7 @@ import { Logo } from "./Logo";
 // Fijo a propósito (no `new Date().getFullYear()`): este footer se renderiza
 // en el layout raíz, es decir en todas las páginas — calcularlo en cada
 // request forzaría a Next a tratar toda la app como dinámica y perder el
-// prerenderizado estático que hoy tiene /calculadora-bonos.
+// prerenderizado estático que hoy tiene /bonos y /calculadora.
 const AÑO = 2026;
 
 const FUENTES = [

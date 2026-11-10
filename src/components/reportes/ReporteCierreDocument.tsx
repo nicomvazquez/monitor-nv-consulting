@@ -3,9 +3,9 @@ import path from "node:path";
 import { Circle, Document, G, Image, Line, Page, Path, StyleSheet, Svg, Text, View } from "@react-pdf/renderer";
 import type { RiesgoPais } from "@/lib/argentinadatos/types";
 import type { Dolar } from "@/lib/dolarapi/types";
-import { formatPrice, formatVolumen } from "@/lib/format";
+import { formatPrice } from "@/lib/format";
 import type { BonoFila } from "@/lib/googlesheets/types";
-import { ajustarCurva, evaluarCurva, media, r2, type Punto } from "@/lib/regresion";
+import { ajustarCurva, evaluarCurva, type Punto } from "@/lib/regresion";
 import type { DatosReporte, Resultado } from "@/lib/reportes/datosReporte";
 import type { ResumenIA } from "@/lib/reportes/resumenIA";
 import type { FilaCotizacion } from "@/lib/types";
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     paddingTop: 46,
     paddingBottom: 22,
     paddingHorizontal: 22,
-    fontSize: 9,
+    fontSize: 9.75,
     fontFamily: "Helvetica",
     color: TEXT,
   },
@@ -93,47 +93,45 @@ const styles = StyleSheet.create({
   footerTexto: { fontSize: 6.5, color: MUTED, maxWidth: 420 },
   seccion: { marginTop: 4 },
   tituloFila: { flexDirection: "row", alignItems: "center", gap: 4 },
-  tituloBarra: { width: 3, height: 8, borderRadius: 1, backgroundColor: ACCENT },
+  tituloBarra: { width: 3, height: 8.5, borderRadius: 1, backgroundColor: ACCENT },
   seccionTitulo: {
-    fontSize: 9.5,
+    fontSize: 10.5,
     fontFamily: "Helvetica-Bold",
     color: ACCENT,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
-  seccionSubtitulo: { fontSize: 7, color: MUTED, marginTop: 1, marginBottom: 3 },
   tabla: { borderWidth: 0.75, borderColor: BORDER, borderRadius: 3, overflow: "hidden" },
-  filaEncabezado: { flexDirection: "row", paddingVertical: 3, paddingHorizontal: 8, backgroundColor: CARD },
+  filaEncabezado: { flexDirection: "row", paddingVertical: 3.25, paddingHorizontal: 9.5, backgroundColor: CARD },
   fila: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 2.75,
-    paddingHorizontal: 8,
-    fontSize: 7.5,
+    paddingVertical: 3.25,
+    paddingHorizontal: 9.5,
+    fontSize: 9,
     borderTopWidth: 0.5,
     borderTopColor: BORDER,
   },
-  encabezadoTexto: { fontSize: 6.25, fontFamily: "Helvetica-Bold", color: ACCENT, textTransform: "uppercase" },
+  encabezadoTexto: { fontSize: 7.25, fontFamily: "Helvetica-Bold", color: ACCENT, textTransform: "uppercase" },
   celdaSimbolo: { fontFamily: "Helvetica-Bold" },
   celdaDerecha: { textAlign: "right" },
   celdaMuted: { color: MUTED },
   celdaVariacionCont: { alignItems: "flex-end" },
-  chip: { fontFamily: "Helvetica-Bold", borderRadius: 6, paddingHorizontal: 4, paddingVertical: 1.5 },
-  sinDatos: { fontSize: 7.5, color: MUTED, fontStyle: "italic", paddingVertical: 4 },
-  grid2: { flexDirection: "row", gap: 9 },
+  chip: { fontFamily: "Helvetica-Bold", borderRadius: 6, paddingHorizontal: 4.75, paddingVertical: 1.85 },
+  sinDatos: { fontSize: 8.25, color: MUTED, fontStyle: "italic", paddingVertical: 4 },
+  grid2: { flexDirection: "row", gap: 9.5 },
   grid2Col: { flex: 1, minWidth: 0 },
   resumenCaja: {
     borderRadius: 4,
     borderLeftWidth: 3,
     borderLeftColor: ACCENT,
     backgroundColor: CARD,
-    paddingVertical: 5.5,
-    paddingHorizontal: 9,
-    lineHeight: 1.32,
+    paddingVertical: 5.25,
+    paddingHorizontal: 9.5,
+    lineHeight: 1.33,
   },
   resumenParrafoSiguiente: { marginTop: 5 },
-  resumenFuentes: { fontSize: 6.5, color: MUTED, marginTop: 4 },
-  tarjetasFila: { flexDirection: "row", gap: 5 },
+  tarjetasFila: { flexDirection: "row", gap: 5.5 },
   tarjetaDolar: {
     flex: 1,
     minWidth: 0,
@@ -143,12 +141,12 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderTopColor: ACCENT,
     backgroundColor: CARD,
-    paddingVertical: 3.5,
-    paddingHorizontal: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 6.5,
   },
-  tarjetaDolarNombre: { fontSize: 6, color: MUTED, textTransform: "uppercase", letterSpacing: 0.3 },
-  tarjetaDolarCompra: { fontSize: 7, color: MUTED, marginTop: 2 },
-  tarjetaDolarVenta: { fontSize: 8.5, fontFamily: "Helvetica-Bold", color: ACCENT, marginTop: 1 },
+  tarjetaDolarNombre: { fontSize: 6.75, color: MUTED, textTransform: "uppercase", letterSpacing: 0.3 },
+  tarjetaDolarCompra: { fontSize: 7.75, color: MUTED, marginTop: 2 },
+  tarjetaDolarVenta: { fontSize: 10, fontFamily: "Helvetica-Bold", color: ACCENT, marginTop: 1 },
   tarjetaIndice: {
     flex: 1,
     minWidth: 0,
@@ -158,16 +156,15 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderTopColor: ACCENT,
     backgroundColor: CARD,
-    paddingVertical: 4,
-    paddingHorizontal: 7,
+    paddingVertical: 4.5,
+    paddingHorizontal: 7.5,
   },
-  tarjetaIndiceNombre: { fontSize: 7, color: MUTED, fontFamily: "Helvetica-Bold" },
-  tarjetaIndiceValor: { fontSize: 9.5, fontFamily: "Helvetica-Bold", color: TEXT, marginTop: 2 },
-  tarjetaIndiceVariacion: { alignSelf: "flex-start", fontSize: 7, marginTop: 3 },
+  tarjetaIndiceNombre: { fontSize: 7.75, color: MUTED, fontFamily: "Helvetica-Bold" },
+  tarjetaIndiceValor: { fontSize: 11, fontFamily: "Helvetica-Bold", color: TEXT, marginTop: 2 },
+  tarjetaIndiceVariacion: { alignSelf: "flex-start", fontSize: 7.75, marginTop: 3 },
   curvaColumna: { flex: 1, minWidth: 0 },
-  curvaCaja: { borderWidth: 0.75, borderColor: BORDER, borderRadius: 3, backgroundColor: CARD, padding: 4.5 },
-  curvaTitulo: { fontSize: 8.5, fontFamily: "Helvetica-Bold", color: ACCENT, marginBottom: 4 },
-  curvaStats: { fontSize: 6.75, color: MUTED, marginTop: 5 },
+  curvaCaja: { borderWidth: 0.75, borderColor: BORDER, borderRadius: 3, backgroundColor: CARD, padding: 5 },
+  curvaTitulo: { fontSize: 10, fontFamily: "Helvetica-Bold", color: ACCENT, marginBottom: 4 },
 });
 
 const formateadorFechaHora = new Intl.DateTimeFormat("es-AR", {
@@ -253,14 +250,13 @@ function Pie() {
 }
 
 /** Título de sección con una pequeña barra de acento: todas las secciones comparten el mismo color (ver `ACCENT`). */
-function TituloSeccion({ titulo, subtitulo }: { titulo: string; subtitulo?: string }) {
+function TituloSeccion({ titulo }: { titulo: string }) {
   return (
-    <View style={{ marginBottom: subtitulo ? 3 : 4 }}>
+    <View style={{ marginBottom: 4 }}>
       <View style={styles.tituloFila}>
         <View style={styles.tituloBarra} />
         <Text style={styles.seccionTitulo}>{titulo}</Text>
       </View>
-      {subtitulo && <Text style={styles.seccionSubtitulo}>{subtitulo}</Text>}
     </View>
   );
 }
@@ -272,10 +268,10 @@ function TituloSeccion({ titulo, subtitulo }: { titulo: string; subtitulo?: stri
  * extiende de más, para que igual entre en una sola página.
  */
 function tamañoAdaptativo(longitud: number): { fontSize: number; lineHeight: number } {
-  if (longitud > 2200) return { fontSize: 8, lineHeight: 1.3 };
-  if (longitud > 1700) return { fontSize: 8.75, lineHeight: 1.32 };
-  if (longitud > 1200) return { fontSize: 9.75, lineHeight: 1.35 };
-  return { fontSize: 10.5, lineHeight: 1.4 };
+  if (longitud > 2200) return { fontSize: 8.25, lineHeight: 1.31 };
+  if (longitud > 1700) return { fontSize: 9, lineHeight: 1.33 };
+  if (longitud > 1200) return { fontSize: 10, lineHeight: 1.36 };
+  return { fontSize: 10.75, lineHeight: 1.41 };
 }
 
 function ResumenDia({ resumen }: { resumen: ResumenIA }) {
@@ -284,7 +280,7 @@ function ResumenDia({ resumen }: { resumen: ResumenIA }) {
 
   return (
     <View style={styles.seccion}>
-      <TituloSeccion titulo="Resumen del día" subtitulo={`Redactado por IA (${resumen.modelo}); puede contener errores.`} />
+      <TituloSeccion titulo="Resumen del día" />
       <View style={[styles.resumenCaja, tamaño]}>
         {parrafos.map((parrafo, i) => (
           <Text key={i} style={i > 0 ? styles.resumenParrafoSiguiente : undefined}>
@@ -292,9 +288,6 @@ function ResumenDia({ resumen }: { resumen: ResumenIA }) {
           </Text>
         ))}
       </View>
-      {resumen.fuentes.length > 0 && (
-        <Text style={styles.resumenFuentes}>Fuentes: {resumen.fuentes.join(", ")}.</Text>
-      )}
     </View>
   );
 }
@@ -303,6 +296,7 @@ function SinDatos({ error }: { error: string | null }) {
   return <Text style={styles.sinDatos}>{error ?? "Sin datos disponibles."}</Text>;
 }
 
+/** Simplificada a propósito: solo símbolo/cierre/variación — la descripción y la cantidad de operaciones no entraban en letra grande sin apretar la fila. */
 function TablaCotizaciones({ resultado }: { resultado: Resultado<FilaCotizacion[]> }) {
   const { datos, error } = resultado;
 
@@ -311,23 +305,17 @@ function TablaCotizaciones({ resultado }: { resultado: Resultado<FilaCotizacion[
   return (
     <View style={styles.tabla}>
       <View style={styles.filaEncabezado}>
-        <Text style={[styles.encabezadoTexto, { width: "15%" }]}>Símbolo</Text>
-        <Text style={[styles.encabezadoTexto, { width: "36%" }]}>Descripción</Text>
-        <Text style={[styles.encabezadoTexto, styles.celdaDerecha, { width: "15%" }]}>Cierre</Text>
-        <Text style={[styles.encabezadoTexto, styles.celdaDerecha, { width: "17%" }]}>Oper.</Text>
-        <Text style={[styles.encabezadoTexto, styles.celdaDerecha, { width: "17%" }]}>Var.</Text>
+        <Text style={[styles.encabezadoTexto, { width: "34%" }]}>Símbolo</Text>
+        <Text style={[styles.encabezadoTexto, styles.celdaDerecha, { width: "33%" }]}>Cierre</Text>
+        <Text style={[styles.encabezadoTexto, styles.celdaDerecha, { width: "33%" }]}>Var.</Text>
       </View>
       {datos.map((item, i) => (
         <View key={item.simbolo} style={[styles.fila, i % 2 === 1 ? { backgroundColor: ZEBRA } : undefined]} wrap={false}>
-          <Text style={[styles.celdaSimbolo, { width: "15%" }]}>{item.simbolo}</Text>
-          <Text style={[styles.celdaMuted, { width: "36%" }]}>{item.descripcion}</Text>
-          <Text style={[styles.celdaDerecha, { width: "15%" }]}>
+          <Text style={[styles.celdaSimbolo, { width: "34%" }]}>{item.simbolo}</Text>
+          <Text style={[styles.celdaDerecha, { width: "33%" }]}>
             {item.ultimoPrecio !== null ? formatPrice(item.ultimoPrecio) : "-"}
           </Text>
-          <Text style={[styles.celdaMuted, styles.celdaDerecha, { width: "17%" }]}>
-            {item.cantidadOperaciones ? formatVolumen(item.cantidadOperaciones) : "-"}
-          </Text>
-          <View style={[styles.celdaVariacionCont, { width: "17%" }]}>
+          <View style={[styles.celdaVariacionCont, { width: "33%" }]}>
             <VariacionChip variacion={item.variacionPorcentual} />
           </View>
         </View>
@@ -337,17 +325,27 @@ function TablaCotizaciones({ resultado }: { resultado: Resultado<FilaCotizacion[
 }
 
 /**
- * Los 5 más operados (mayor cantidad de operaciones) de un panel; `null` si
- * no hay datos. Se ordena por `cantidadOperaciones`, no por `volumen`: IOL
- * solo informa el volumen operado en vivo y lo vuelve 0 con el mercado
- * cerrado, mientras que la cantidad de operaciones del día sigue reflejando
- * el total real después del cierre (que es cuando corre el reporte).
+ * Los 5 más operados (mayor cantidad de operaciones) de un panel de IOL;
+ * `null` si no hay datos. Se ordena por `cantidadOperaciones`, no por
+ * `volumen`: IOL solo informa el volumen operado en vivo y lo vuelve 0 con
+ * el mercado cerrado, mientras que la cantidad de operaciones del día sigue
+ * reflejando el total real después del cierre (que es cuando corre el
+ * reporte).
  */
-function top5PorVolumen(datos: FilaCotizacion[] | null): FilaCotizacion[] | null {
+function top5PorOperaciones(datos: FilaCotizacion[] | null): FilaCotizacion[] | null {
   if (!datos) return null;
   return [...datos]
     .filter((item) => item.cantidadOperaciones !== null && item.cantidadOperaciones !== undefined)
     .sort((a, b) => (b.cantidadOperaciones as number) - (a.cantidadOperaciones as number))
+    .slice(0, 5);
+}
+
+/** Las 5 más operadas por volumen en USDT (Binance no informa cantidad de operaciones del día, a diferencia de IOL — ver `top5PorOperaciones`). */
+function top5PorVolumen(datos: FilaCotizacion[] | null): FilaCotizacion[] | null {
+  if (!datos) return null;
+  return [...datos]
+    .filter((item) => item.volumen !== null && item.volumen !== undefined)
+    .sort((a, b) => (b.volumen as number) - (a.volumen as number))
     .slice(0, 5);
 }
 
@@ -400,11 +398,11 @@ function TarjetasCotizacion({ resultado }: { resultado: Resultado<FilaCotizacion
 }
 
 const CURVA_ANCHO = 250;
-const CURVA_ALTO = 94;
-const CURVA_PAD_IZQ = 27;
-const CURVA_PAD_DER = 8;
-const CURVA_PAD_ARRIBA = 12;
-const CURVA_PAD_ABAJO = 20;
+const CURVA_ALTO = 102;
+const CURVA_PAD_IZQ = 29;
+const CURVA_PAD_DER = 10;
+const CURVA_PAD_ARRIBA = 13;
+const CURVA_PAD_ABAJO = 12.5;
 const CURVA_GRIDLINES = 3;
 const CURVA_MUESTRAS = 24;
 
@@ -425,8 +423,9 @@ function escalar(valor: number, min: number, max: number, destinoMin: number, de
  * `BonosCurvaChart` del sitio: la curva y "barato" van en el color de texto
  * principal (más visibles), "caro" en el muted — el verde/rojo del reporte
  * se reserva para variaciones de precio reales, no para esta señal de
- * valuación relativa. Sin tabla de detalle debajo (a propósito): el reporte
- * queda solo con la lectura visual, cada punto ya lleva su ticker.
+ * valuación relativa. Sin tabla de detalle ni leyenda de stats debajo (a
+ * propósito): el reporte queda solo con la lectura visual, cada punto ya
+ * lleva su ticker.
  */
 function CurvaBonosPdf({ filas, seccion, titulo }: { filas: BonoFila[]; seccion: string; titulo: string }) {
   const bonos = filas
@@ -448,10 +447,6 @@ function CurvaBonosPdf({ filas, seccion, titulo }: { filas: BonoFila[]; seccion:
   }
 
   const coeficientes = ajustarCurva(puntos);
-  const bondadAjuste = r2(puntos, coeficientes);
-  const tirPromedio = media(puntos.map((p) => p.y));
-  const baratos = puntos.filter((p) => p.y > evaluarCurva(coeficientes, p.x)).length;
-  const caros = puntos.length - baratos;
 
   const duraciones = puntos.map((p) => p.x);
   const tires = puntos.map((p) => p.y);
@@ -498,26 +493,23 @@ function CurvaBonosPdf({ filas, seccion, titulo }: { filas: BonoFila[]; seccion:
                 stroke={BORDER}
                 strokeWidth={0.75}
               />
-              <Text x={CURVA_PAD_IZQ - 5} y={y + 2.5} textAnchor="end" style={{ fontSize: 6.5, fill: MUTED }}>
+              <Text x={CURVA_PAD_IZQ - 5} y={y + 2.65} textAnchor="end" style={{ fontSize: 7.25, fill: MUTED }}>
                 {valor.toFixed(1)}%
               </Text>
             </G>
           ))}
 
-          <Path d={curvaPath} fill="none" stroke={ACCENT} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+          <Path d={curvaPath} fill="none" stroke={ACCENT} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
 
           {coords.map((c) => (
             <G key={c.ticker}>
-              <Circle cx={c.cx} cy={c.cy} r={3.8} fill={c.barato ? TEXT : MUTED} stroke={BG} strokeWidth={1.3} />
-              <Text x={c.cx} y={c.cy - 8} textAnchor="middle" style={{ fontSize: 6.5, fill: TEXT, fontFamily: "Helvetica-Bold" }}>
+              <Circle cx={c.cx} cy={c.cy} r={4.15} fill={c.barato ? TEXT : MUTED} stroke={BG} strokeWidth={1.35} />
+              <Text x={c.cx} y={c.cy - 8.75} textAnchor="middle" style={{ fontSize: 7.25, fill: TEXT, fontFamily: "Helvetica-Bold" }}>
                 {c.ticker}
               </Text>
             </G>
           ))}
         </Svg>
-        <Text style={styles.curvaStats}>
-          R² {formatPrice(bondadAjuste * 100)}% · TIR prom. {formatPrice(tirPromedio)}% · {baratos} baratos / {caros} caros
-        </Text>
       </View>
     </View>
   );
@@ -525,12 +517,14 @@ function CurvaBonosPdf({ filas, seccion, titulo }: { filas: BonoFila[]; seccion:
 
 /**
  * Reporte de cierre en una sola página: dólares (tarjetas) → resumen del día
- * con IA (noticias + rueda) → índices (tarjetas) → top 5 movimientos de Panel
- * Líder y CEDEARs (tablas) → curvas de rendimiento de bonos (sin tabla de
- * detalle, ver `CurvaBonosPdf`) → criptomonedas y commodities (tablas, mismo
- * formato que Panel Líder/CEDEARs). Riesgo país va en el encabezado, no acá
- * (ver `Encabezado`). El resto de los paneles de la home (caución, letras,
- * bonos CER, etc.) no entran en este formato compacto.
+ * con IA (noticias + rueda) → índices (tarjetas) → top 5 de Panel Líder y
+ * CEDEARs (tablas, por cantidad de operaciones) → curvas de rendimiento de
+ * bonos (sin leyenda de stats abajo, ver `CurvaBonosPdf`) → top 5 de
+ * criptomonedas (por volumen) y commodities completo, mismo formato
+ * simplificado (símbolo/cierre/variación) en todas las tablas. Riesgo país
+ * va en el encabezado, no acá (ver `Encabezado`). El resto de los paneles de
+ * la home (caución, letras, bonos CER, etc.) no entran en este formato
+ * compacto.
  * Misma paleta e identidad visual que el sitio (fondo negro, acento celeste,
  * verde/rojo solo para variaciones de precio) en vez de un esquema propio
  * "para papel".
@@ -568,13 +562,13 @@ export function ReporteCierreDocument({ datos, resumen }: { datos: DatosReporte;
             <View style={styles.grid2Col}>
               <TituloSeccion titulo="Top 5 — Panel Líder" />
               <TablaCotizaciones
-                resultado={{ datos: top5PorVolumen(datos.panelLider.datos), error: datos.panelLider.error }}
+                resultado={{ datos: top5PorOperaciones(datos.panelLider.datos), error: datos.panelLider.error }}
               />
             </View>
             <View style={styles.grid2Col}>
               <TituloSeccion titulo="Top 5 — CEDEARs" />
               <TablaCotizaciones
-                resultado={{ datos: top5PorVolumen(datos.cedears.datos), error: datos.cedears.error }}
+                resultado={{ datos: top5PorOperaciones(datos.cedears.datos), error: datos.cedears.error }}
               />
             </View>
           </View>
@@ -590,8 +584,8 @@ export function ReporteCierreDocument({ datos, resumen }: { datos: DatosReporte;
         <View style={styles.seccion}>
           <View style={styles.grid2}>
             <View style={styles.grid2Col}>
-              <TituloSeccion titulo="Criptomonedas" />
-              <TablaCotizaciones resultado={datos.criptos} />
+              <TituloSeccion titulo="Top 5 — Criptomonedas" />
+              <TablaCotizaciones resultado={{ datos: top5PorVolumen(datos.criptos.datos), error: datos.criptos.error }} />
             </View>
             <View style={styles.grid2Col}>
               <TituloSeccion titulo="Commodities" />

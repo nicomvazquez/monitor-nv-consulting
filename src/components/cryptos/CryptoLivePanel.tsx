@@ -11,6 +11,7 @@ const RECONEXION_MS = 3000;
 const streams = CRYPTOS_SIMBOLOS.map((simbolo) => `${simbolo.toLowerCase()}usdt@ticker`).join("/");
 const wsUrl = `${BINANCE_WS_URL}?streams=${streams}`;
 
+/** Panel chico de la home: mismo formato que los demás paneles del muro (Panel Líder, CEDEARs, ...) — para la tabla completa con todas las columnas, ver `CriptoCompletaLivePanel` en `/criptomonedas`. */
 export function CryptoLivePanel({ inicial }: { inicial: FilaCotizacion[] }) {
   const [items, setItems] = useState(inicial);
 

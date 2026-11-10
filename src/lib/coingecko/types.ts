@@ -61,3 +61,12 @@ export interface CoinGeckoMoneda {
 export interface CoinGeckoMarketChart {
   prices: [number, number][];
 }
+
+/** GET /coins/markets?vs_currency=usd&ids=... — un objeto por moneda, sin anidar como `/coins/{id}`. */
+export interface CoinGeckoMarketItem {
+  id: string;
+  symbol: string;
+  market_cap: number;
+  total_volume: number;
+  market_cap_change_percentage_24h: number;
+}

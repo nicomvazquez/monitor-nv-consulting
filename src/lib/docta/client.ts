@@ -23,3 +23,24 @@ export async function doctaFetch<T>(path: string, { revalidateSeconds }: { reval
 
   return (await response.json()) as T;
 }
+
+/**
+ * Igual que `doctaFetch`, pero devuelve `null` en un 404 en vez de tirar —
+ * para el cashflow de bonos, donde hace falta reintentar con otro ticker
+ * (ver `lib/docta/cashflow.ts`) sin que el primer intento cuente como error.
+ */
+export async function doctaFetchOpcional<T>(path: string, { revalidateSeconds }: { revalidateSeconds: number }): Promise<T | null> {
+  const token = await getDoctaAccessToken();
+
+  const response = await fetch(`${DOCTA_BASE_URL}${path}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    next: { revalidate: revalidateSeconds },
+  });
+
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    throw new Error(`Pedido a Docta falló (${path}): ${response.status} ${response.statusText}`);
+  }
+
+  return (await response.json()) as T;
+}

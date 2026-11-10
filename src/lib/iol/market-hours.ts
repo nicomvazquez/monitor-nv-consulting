@@ -64,6 +64,35 @@ export function revalidateSecondsPara(mercadoAbierto: boolean): number {
   return mercadoAbierto ? REVALIDATE_SECONDS_MERCADO_ABIERTO : REVALIDATE_SECONDS_MERCADO_CERRADO;
 }
 
+/** Fecha de hoy en Buenos Aires como "YYYY-MM-DD", sin hora. */
+export function fechaHoyArgentina(date: Date = new Date()): string {
+  return partesFecha(date).fechaISO;
+}
+
+/**
+ * Próximo día hábil después de `date` (fin de semana y feriados nacionales
+ * excluidos) como "YYYY-MM-DD" — la liquidación "24hs" (la más común/líquida)
+ * que usa la calculadora de TIR para descontar el cronograma de pagos de un
+ * bono: un día hábil después de hoy, no hoy mismo.
+ */
+export async function proximaFechaLiquidacion(date: Date = new Date()): Promise<string> {
+  const { fechaISO } = partesFecha(date);
+  const [anioStr, mesStr, diaStr] = fechaISO.split("-");
+  const cursor = new Date(Date.UTC(Number(anioStr), Number(mesStr) - 1, Number(diaStr)));
+
+  for (let i = 0; i < 10; i++) {
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+    if (esFinDeSemanaUTC(cursor)) continue;
+
+    const feriados = await feriadosAlrededorDe(cursor.getUTCFullYear());
+    if (feriados.has(cursor.toISOString().slice(0, 10))) continue;
+
+    return cursor.toISOString().slice(0, 10);
+  }
+
+  return cursor.toISOString().slice(0, 10);
+}
+
 function esFinDeSemanaUTC(fecha: Date): boolean {
   const dia = fecha.getUTCDay();
   return dia === 0 || dia === 6;

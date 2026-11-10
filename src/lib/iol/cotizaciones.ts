@@ -140,6 +140,29 @@ export async function getBonosSoberanosDolaresMep(modo: ModoPrecio = "auto"): Pr
     .map((item) => aFila(item, modo, mercadoAbierto));
 }
 
+/**
+ * Precio de un bono puntual por ticker (ej. "AL30D"), buscado dentro del
+ * universo completo que trae el endpoint de bonos de IOL (soberanos y
+ * obligaciones negociables juntos — ver el comentario de `BONOS` en
+ * `config.ts`). `null` si IOL no tiene ese ticker cotizando (puede pasar con
+ * algunas ONs poco líquidas). Usa "cierre" por defecto (no el precio en
+ * vivo): así el precio sugerido se mantiene estable durante toda la rueda,
+ * lo que le permite a esa consulta cachear por todo el día en vez de
+ * recalcularse en cada visita (ver `getDatosCalculadoraTir` en
+ * `lib/docta/calculadoraTir.ts`).
+ */
+export async function getPrecioBono(simbolo: string, modo: ModoPrecio = "cierre"): Promise<FilaCotizacion | null> {
+  const mercadoAbierto = await isMercadoAbierto();
+  const { instrumento, panel, pais } = BONOS;
+  const { titulos } = await iolFetch<CotizacionesPanelResponse>(
+    `/api/v2/Cotizaciones/${instrumento}/${panel}/${pais}`,
+    { revalidateSeconds: revalidateSecondsPara(mercadoAbierto) },
+  );
+
+  const item = titulos.find((titulo) => titulo.simbolo === simbolo);
+  return item ? aFila(item, modo, mercadoAbierto) : null;
+}
+
 export async function getLetras(modo: ModoPrecio = "auto"): Promise<FilaCotizacion[]> {
   const mercadoAbierto = await isMercadoAbierto();
   const { instrumento, panel, pais } = LETRAS;

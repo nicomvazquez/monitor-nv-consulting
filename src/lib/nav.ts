@@ -1,4 +1,4 @@
-import { Calculator, ChartLineUp, CurrencyBtc, Globe, House, Newspaper, Scroll, Table } from "@phosphor-icons/react/dist/ssr";
+import { Calculator, ChartLineUp, CurrencyBtc, Globe, House, Newspaper, Table } from "@phosphor-icons/react/dist/ssr";
 import type { Icon } from "@phosphor-icons/react";
 
 /**
@@ -33,12 +33,15 @@ export const GRUPOS: { categoria: string; enlaces: Enlace[] }[] = [
   {
     categoria: "Renta fija",
     enlaces: [
-      { href: "/calculadora-bonos", label: "Calculadora de bonos", descripcion: "TIR, duration y curva de rendimientos", Icono: Calculator },
-      { href: "/obligaciones-negociables", label: "Obligaciones negociables", descripcion: "Listado filtrable por sector, emisor y ley", Icono: Scroll },
+      { href: "/bonos", label: "Bonos", descripcion: "Soberanos y LECAPs, con curva de rendimientos", Icono: Table },
+      { href: "/calculadora", label: "Calculadora", descripcion: "TIR, duration y cashflow por bono", Icono: Calculator },
     ],
   },
   {
     categoria: "Cripto",
-    enlaces: [{ href: "/cripto", label: "Cripto", descripcion: "Mapa de calor, cotizaciones y ficha de análisis por moneda", Icono: CurrencyBtc }],
+    enlaces: [
+      { href: "/cripto", label: "Cripto", descripcion: "Mapa de calor e indicadores del mercado", Icono: CurrencyBtc },
+      { href: "/criptomonedas", label: "Criptomonedas", descripcion: "Las 30 más importantes, con precio en vivo", Icono: Table },
+    ],
   },
 ];

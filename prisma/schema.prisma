@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Neon vía la integración nativa de Vercel: `DATABASE_URL` es la conexión
+// pooled (PgBouncer, la que usa la app en cada pedido) y `DATABASE_URL_UNPOOLED`
+// la directa (la que necesita `prisma migrate`, que no funciona bien a través
+// del pool). Ambas las agrega Vercel solas al crear la base — ver README/env.local.example.
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+/**
+ * Un usuario se crea/actualiza a mano en el callback `signIn` de
+ * `src/auth.ts`, no vía un adapter de Auth.js — probado a mano contra la
+ * base real: con `session.strategy: "jwt"` (la sesión sigue en cookie, no en
+ * la base), el adapter de Prisma no llega a tocar la base en el login, así
+ * que no tiene sentido mantener los modelos Account/Session/VerificationToken
+ * que ese adapter necesitaría — no los escribe nadie.
+ */
+model User {
+  id           String   @id @default(cuid())
+  name         String?
+  email        String   @unique
+  image        String?
+  creadoEn     DateTime @default(now())
+  ultimoAcceso DateTime @default(now())
+}
+
+/**
+ * Cronograma de pagos de un bono, guardado la primera vez que alguien lo
+ * pide — ver `lib/docta/cashflow.ts`. A diferencia del cache de 24hs de
+ * Next (`next: { revalidate }`), esto es permanente: el cronograma de un
+ * bono no cambia una vez emitido (salvo un reestructuramiento, un caso raro
+ * que se puede resolver borrando la fila a mano), así que no hace falta
+ * volver a pedírselo nunca más a Docta.
+ */
+model CashflowBono {
+  ticker    String   @id
+  data      Json
+  fetchedAt DateTime @default(now())
+}

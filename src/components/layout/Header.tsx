@@ -1,28 +1,13 @@
-import { CurrencyBtc } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import type { Session } from "next-auth";
-import { VariacionBadge } from "@/components/cotizaciones/VariacionBadge";
 import type { Dolar } from "@/lib/dolarapi/types";
+import { BtcChip } from "./BtcChip";
 import { DolaresCarousel } from "@/components/dolares/DolaresCarousel";
 import { cerrarSesion, iniciarSesionGoogle } from "@/lib/auth/actions";
-import { formatPrice } from "@/lib/format";
 import { GoogleIcon } from "@/components/ui/GoogleIcon";
 import type { FilaCotizacion } from "@/lib/types";
 import { Logo } from "./Logo";
 import { MenuLateral } from "./MenuLateral";
-
-/** Precio de Bitcoin al lado del logo: el dato de mercado que más se mira de arrancada, visible en todo el sitio (no solo en la home). */
-function BtcChip({ btc }: { btc: FilaCotizacion | null }) {
-  if (!btc || btc.ultimoPrecio === null) return null;
-
-  return (
-    <div className="flex items-center gap-1.5 rounded-full border border-border bg-card/60 py-1 pr-2.5 pl-2 max-sm:hidden">
-      <CurrencyBtc size={16} weight="bold" className="flex-none text-accent" aria-hidden="true" />
-      <span className="font-mono text-sm font-semibold tabular-nums text-foreground">US${formatPrice(btc.ultimoPrecio)}</span>
-      <VariacionBadge variacion={btc.variacionPorcentual} />
-    </div>
-  );
-}
 
 /** Reemplaza los links de Noticias/Calculadora de bonos que tenía esta fila antes — esos ahora viven en el menú lateral. */
 function SesionNav({ sesion }: { sesion: Session | null }) {
